@@ -5,7 +5,7 @@ export default function Loader({ items, onFinished }) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (items.length === 0) {
+    if (!items || items.length === 0) {
       onFinished();
       return;
     }
@@ -19,15 +19,25 @@ export default function Loader({ items, onFinished }) {
       setProgress(currentProgress);
 
       if (loadedCount === totalItems) {
-        setTimeout(onFinished, 500); // Una mica de marge per suavitat
+        // Donem un petit marge perquè l'animació de la barra arribi al final
+        setTimeout(onFinished, 600);
       }
     };
 
     items.forEach((url) => {
       const img = new Image();
       img.src = url;
-      img.onload = updateProgress;
-      img.onerror = updateProgress; // Si una falla, continuem per no bloquejar la web
+
+      // EL CANVI CLAU: .decode() prepara els píxels en memòria RAM/GPU
+      img.decode()
+        .then(() => {
+          updateProgress();
+        })
+        .catch((err) => {
+          console.error("Error descodificant la imatge:", url, err);
+          // Si falla (per format o pes), sumem igualment per no bloquejar la web
+          updateProgress();
+        });
     });
   }, [items, onFinished]);
 
@@ -44,19 +54,40 @@ export default function Loader({ items, onFinished }) {
       color: 'white',
       fontFamily: 'var(--font-titol)'
     }}>
-      <div style={{ fontSize: '4rem', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>
+      {/* Comptador percentual */}
+      <div style={{ 
+        fontSize: '5rem', 
+        fontWeight: '700', 
+        fontVariantNumeric: 'tabular-nums',
+        letterSpacing: '-2px'
+      }}>
         {progress}%
       </div>
-      <div style={{ width: '200px', height: '2px', backgroundColor: '#333', marginTop: '20px' }}>
+
+      {/* Barra de progrés */}
+      <div style={{ 
+        width: '240px', 
+        height: '2px', 
+        backgroundColor: '#222', 
+        marginTop: '20px',
+        overflow: 'hidden'
+      }}>
         <div style={{ 
           height: '100%', 
           backgroundColor: 'white', 
           width: `${progress}%`, 
-          transition: 'width 0.2s ease-out' 
+          transition: 'width 0.3s ease-out' 
         }} />
       </div>
-      <p style={{ marginTop: '15px', fontSize: '0.8rem', color: '#666', letterSpacing: '2px' }}>
-        LOADING ASSETS
+
+      <p style={{ 
+        marginTop: '20px', 
+        fontSize: '0.7rem', 
+        color: '#555', 
+        letterSpacing: '3px',
+        textTransform: 'uppercase'
+      }}>
+        Optimizing Experience
       </p>
     </div>
   );

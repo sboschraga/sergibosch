@@ -7,7 +7,7 @@ import Loader from '../components/Loader';
 export default function Home() {
   const [loading, setLoading] = useState(true);
 
-  // Llista de projectes organitzada
+  // Llista de projectes organitzada (Exactament la teva)
   const projects = {
     culactiu: [
       '/trail/Culactiu_1.png', '/trail/Culactiu_2.png', '/trail/Culactiu_3.png', 
@@ -38,7 +38,7 @@ export default function Home() {
     ]
   };
 
-  // Funció per intercalar les imatges de cada projecte
+  // Funció per intercalar les imatges (Lògica neta)
   const interleavedList = useMemo(() => {
     const keys = Object.keys(projects);
     const maxLength = Math.max(...keys.map(k => projects[k].length));
@@ -52,29 +52,29 @@ export default function Home() {
       });
     }
     return result;
-  }, []);
+  }, [projects]);
 
- return (
-  <>
-    {/* Passem la llista al Loader per pre-carregar les imatges realment */}
-    {loading && (
-      <Loader 
-        items={interleavedList} 
-        onFinished={() => setLoading(false)} 
-      />
-    )}
-    
-    <main style={{ 
-      height: '100vh', 
-      width: '100vw', 
-      position: 'relative', 
-      backgroundColor: '#121212', 
-      overflow: 'hidden',
-      opacity: loading ? 0 : 1, // Només es mostra quan les imatges estan a la memòria
-      transition: 'opacity 0.8s ease-in-out'
-    }}>
+  return (
+    <>
+      {/* Pre-càrrega real d'imatges */}
+      {loading && (
+        <Loader 
+          items={interleavedList} 
+          onFinished={() => setLoading(false)} 
+        />
+      )}
+      
+      <main style={{ 
+        height: '100vh', 
+        width: '100vw', 
+        position: 'relative', 
+        backgroundColor: '#121212', 
+        overflow: 'hidden',
+        opacity: loading ? 0 : 1,
+        transition: 'opacity 0.8s ease-in-out'
+      }}>
         
-        {/* CAPA 0: Graella de punts (Fons) */}
+        {/* CAPA 0: Els Punts */}
         <div style={{
           position: 'absolute', 
           inset: 0,
@@ -83,12 +83,12 @@ export default function Home() {
           zIndex: 0
         }} />
         
-        {/* CAPA 1: Trail d'imatges (Capa interactiva) */}
+        {/* CAPA 1: Trail d'imatges */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
           <ImageTrail items={interleavedList} />
         </div>
 
-        {/* CAPA 2: Interfície d'usuari (Z-index superior) */}
+        {/* CAPA 2: Interfície (Nav i Text) */}
         <div style={{ 
           position: 'absolute', 
           inset: 0, 
@@ -98,7 +98,6 @@ export default function Home() {
           pointerEvents: 'none' 
         }}>
           
-          {/* Barra de navegació */}
           <nav style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
@@ -115,7 +114,6 @@ export default function Home() {
             <span>Contact</span>
           </nav>
 
-          {/* Contingut central */}
           <div style={{ 
             flex: 1, 
             display: 'flex', 
