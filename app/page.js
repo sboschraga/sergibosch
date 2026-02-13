@@ -13,7 +13,7 @@ export default function Home() {
       '/trail/Culactiu_1.png', '/trail/Culactiu_2.png', '/trail/Culactiu_3.png', 
       '/trail/Culactiu_4.jpg', '/trail/Culactiu_5.jpg', '/trail/Culactiu_6.jpg', 
       '/trail/Culactiu_7.jpg', '/trail/Culactiu_8.png', '/trail/Culactiu_9.png', 
-      '/trail/Culactiu_10.jpeg', '/trail/Culactiu_11.jpeg', '/trail/Culactiu_13.jpg', 
+      '/trail/Culactiu_10.jpeg', '/trail/Culactiu_11.jpeg', '/trail/Culactiu_13.png', 
       '/trail/Culactiu_14.png', '/trail/Culactiu_15.png', '/trail/Culactiu_16.png'
     ],
     cumulus: [
@@ -114,37 +114,39 @@ export default function Home() {
             <span>Contact</span>
           </nav>
 
-          <div style={{ 
-            flex: 1, 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            textAlign: 'center' 
-          }}>
-            <h1 style={{ 
-              fontFamily: 'var(--font-cos)', 
-              fontSize: '1.6rem', 
-              maxWidth: '850px', 
-              lineHeight: '1.5', 
-              pointerEvents: 'auto' 
-            }}>
-              <DecryptedText 
-                text="THIS DIGITAL SPACE FEATURES SOME OF MY WORK AND INTERESTS." 
-                animateOn="hover" 
-                speed={50} 
-              />
-            </h1>
-            <p style={{ 
-              color: '#888', 
-              marginTop: '20px', 
-              fontSize: '1.1rem', 
-              fontWeight: '400',
-              fontFamily: 'var(--font-cos)'
-            }}>
-              Feel Free To Explore The Projects!
-            </p>
-          </div>
+          {/* Contingut central */}
+<div style={{ 
+  flex: 1, 
+  display: 'flex', 
+  flexDirection: 'column',
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  textAlign: 'center',
+  padding: '0 20px' // Seguretat per a pantalles petites
+}}>
+  <h1 style={{ 
+    fontFamily: 'var(--font-cos)', 
+    fontSize: '1.2rem', // Mida més petita per encabir-ho tot
+    maxWidth: '1000px', // Ampliem el límit horitzontal
+    lineHeight: '1.5', 
+    pointerEvents: 'auto',
+    whiteSpace: 'nowrap' // Opcional: força que no hi hagi salts de línia
+  }}>
+    <DecryptedText 
+      text="THIS DIGITAL SPACE FEATURES SOME OF MY WORK AND INTERESTS." 
+      speed={40} 
+    />
+  </h1>
+  <p style={{ 
+    color: '#888', 
+    marginTop: '10px', 
+    fontSize: '1rem', // També reduïm una mica el peu
+    fontWeight: '400',
+    fontFamily: 'var(--font-cos)'
+  }}>
+    Feel Free To Explore The Projects!
+  </p>
+</div>
         </div>
 
         <style jsx global>{`

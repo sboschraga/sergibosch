@@ -1,208 +1,132 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
-import { motion } from 'motion/react';
+import { useState, useMemo, useEffect } from 'react';
+import DecryptedText from '../components/DecryptedText';
+import ImageTrail from '../components/ImageTrail';
+import Loader from '../components/Loader';
 
-const styles = {
-  wrapper: {
-    display: 'inline-block',
-    whiteSpace: 'pre-wrap'
-  },
-  srOnly: {
-    position: 'absolute',
-    width: '1px',
-    height: '1px',
-    padding: 0,
-    margin: '-1px',
-    overflow: 'hidden',
-    clip: 'rect(0,0,0,0)',
-    border: 0
-  }
-};
+export default function Home() {
+  const [loading, setLoading] = useState(true);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-export default function DecryptedText({
-  text,
-  speed = 50,
-  maxIterations = 10,
-  sequential = false,
-  revealDirection = 'start',
-  useOriginalCharsOnly = false,
-  characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+',
-  className = '',
-  parentClassName = '',
-  encryptedClassName = '',
-  animateOn = 'hover',
-  ...props
-}) {
-  const [displayText, setDisplayText] = useState(text);
-  const [isHovering, setIsHovering] = useState(false);
-  const [isScrambling, setIsScrambling] = useState(false);
-  const [revealedIndices, setRevealedIndices] = useState(new Set());
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const containerRef = useRef(null);
-
+  // Lògica per al cursor quadrat
   useEffect(() => {
-    let interval;
-    let currentIteration = 0;
-
-    const getNextIndex = revealedSet => {
-      const textLength = text.length;
-      switch (revealDirection) {
-        case 'start':
-          return revealedSet.size;
-        case 'end':
-          return textLength - 1 - revealedSet.size;
-        case 'center': {
-          const middle = Math.floor(textLength / 2);
-          const offset = Math.floor(revealedSet.size / 2);
-          const nextIndex = revealedSet.size % 2 === 0 ? middle + offset : middle - offset - 1;
-
-          if (nextIndex >= 0 && nextIndex < textLength && !revealedSet.has(nextIndex)) {
-            return nextIndex;
-          }
-
-          for (let i = 0; i < textLength; i++) {
-            if (!revealedSet.has(i)) return i;
-          }
-          return 0;
-        }
-        default:
-          return revealedSet.size;
-      }
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
     };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
-    const availableChars = useOriginalCharsOnly
-      ? Array.from(new Set(text.split(''))).filter(char => char !== ' ')
-      : characters.split('');
+  const projects = {
+    culactiu: ['/trail/Culactiu_1.png', '/trail/Culactiu_2.png', '/trail/Culactiu_3.png', '/trail/Culactiu_4.jpg', '/trail/Culactiu_5.jpg', '/trail/Culactiu_6.jpg', '/trail/Culactiu_7.jpg', '/trail/Culactiu_8.png', '/trail/Culactiu_9.png', '/trail/Culactiu_10.jpeg', '/trail/Culactiu_11.jpeg', '/trail/Culactiu_13.png', '/trail/Culactiu_14.png', '/trail/Culactiu_15.png', '/trail/Culactiu_16.png'],
+    cumulus: ['/trail/Cumulus_1.jpg', '/trail/Cumulus_2.jpg', '/trail/Cumulus_3.jpg', '/trail/Cumulus_4.jpg'],
+    doom: ['/trail/Doom_1.jpeg', '/trail/Doom_2.jpeg', '/trail/Doom_3.jpeg', '/trail/Doom_4.jpg', '/trail/Doom_5.jpeg', '/trail/Doom_6.jpeg'],
+    malreal: ['/trail/Malreal_1.png', '/trail/Malreal_2.png', '/trail/Malreal_3.png', '/trail/Malreal_4.jpg', '/trail/Malreal_5.jpg'],
+    relationships: ['/trail/Relationships_1.JPG', '/trail/Relationships_2.JPG', '/trail/Relationships_3.JPG', '/trail/Relationships_4.JPG'],
+    vasudeva: ['/trail/Vasudeva_3.png', '/trail/Vasudeva_4.png', '/trail/Vasudeva_5.png', '/trail/Vasudeva_6.png']
+  };
 
-    const shuffleText = (originalText, currentRevealed) => {
-      if (useOriginalCharsOnly) {
-        const positions = originalText.split('').map((char, i) => ({
-          char,
-          isSpace: char === ' ',
-          index: i,
-          isRevealed: currentRevealed.has(i)
-        }));
-
-        const nonSpaceChars = positions.filter(p => !p.isSpace && !p.isRevealed).map(p => p.char);
-
-        for (let i = nonSpaceChars.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [nonSpaceChars[i], nonSpaceChars[j]] = [nonSpaceChars[j], nonSpaceChars[i]];
-        }
-
-        let charIndex = 0;
-        return positions
-          .map(p => {
-            if (p.isSpace) return ' ';
-            if (p.isRevealed) return originalText[p.index];
-            return nonSpaceChars[charIndex++];
-          })
-          .join('');
-      } else {
-        return originalText
-          .split('')
-          .map((char, i) => {
-            if (char === ' ') return ' ';
-            if (currentRevealed.has(i)) return originalText[i];
-            return availableChars[Math.floor(Math.random() * availableChars.length)];
-          })
-          .join('');
-      }
-    };
-
-    if (isHovering) {
-      setIsScrambling(true);
-      interval = setInterval(() => {
-        setRevealedIndices(prevRevealed => {
-          if (sequential) {
-            if (prevRevealed.size < text.length) {
-              const nextIndex = getNextIndex(prevRevealed);
-              const newRevealed = new Set(prevRevealed);
-              newRevealed.add(nextIndex);
-              setDisplayText(shuffleText(text, newRevealed));
-              return newRevealed;
-            } else {
-              clearInterval(interval);
-              setIsScrambling(false);
-              return prevRevealed;
-            }
-          } else {
-            setDisplayText(shuffleText(text, prevRevealed));
-            currentIteration++;
-            if (currentIteration >= maxIterations) {
-              clearInterval(interval);
-              setIsScrambling(false);
-              setDisplayText(text);
-            }
-            return prevRevealed;
-          }
-        });
-      }, speed);
-    } else {
-      setDisplayText(text);
-      setRevealedIndices(new Set());
-      setIsScrambling(false);
+  const interleavedList = useMemo(() => {
+    const keys = Object.keys(projects);
+    const maxLength = Math.max(...keys.map(k => projects[k].length));
+    const result = [];
+    for (let i = 0; i < maxLength; i++) {
+      keys.forEach(key => { if (projects[key][i]) result.push(projects[key][i]); });
     }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isHovering, text, speed, maxIterations, sequential, revealDirection, characters, useOriginalCharsOnly]);
-
-  useEffect(() => {
-    if (animateOn !== 'view' && animateOn !== 'both') return;
-
-    const observerCallback = entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setIsHovering(true);
-          setHasAnimated(true);
-        }
-      });
-    };
-
-    const observerOptions = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.1
-    };
-
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-    const currentRef = containerRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, [animateOn, hasAnimated]);
-
-  const hoverProps =
-    animateOn === 'hover' || animateOn === 'both'
-      ? {
-          onMouseEnter: () => setIsHovering(true),
-          onMouseLeave: () => setIsHovering(false)
-        }
-      : {};
+    return result;
+  }, [projects]);
 
   return (
-    <motion.span className={parentClassName} ref={containerRef} style={styles.wrapper} {...hoverProps} {...props}>
-      <span style={styles.srOnly}>{displayText}</span>
+    <>
+      {loading && <Loader items={interleavedList} onFinished={() => setLoading(false)} />}
+      
+      {/* CURSOR QUADRAT */}
+      {!loading && (
+        <div style={{
+          position: 'fixed',
+          left: mousePos.x,
+          top: mousePos.y,
+          width: '10px',
+          height: '10px',
+          backgroundColor: 'white',
+          zIndex: 9999,
+          pointerEvents: 'none',
+          transform: 'translate(-50%, -50%)',
+          mixBlendMode: 'difference' // Això fa que es vegi sempre segons el fons
+        }} />
+      )}
 
-      <span aria-hidden="true">
-        {displayText.split('').map((char, index) => {
-          const isRevealedOrDone = revealedIndices.has(index) || !isScrambling || !isHovering;
+      <main style={{ 
+        height: '100vh', width: '100vw', position: 'relative', backgroundColor: '#121212', 
+        overflow: 'hidden', opacity: loading ? 0 : 1, transition: 'opacity 0.8s ease-in-out',
+        cursor: 'none' // Amaguem el cursor original
+      }}>
+        
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)', backgroundSize: '30px 30px', zIndex: 0 }} />
+        
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+          <ImageTrail items={interleavedList} />
+        </div>
 
-          return (
-            <span key={index} className={isRevealedOrDone ? className : encryptedClassName}>
-              {char}
-            </span>
-          );
-        })}
-      </span>
-    </motion.span>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', flexDirection: 'column', pointerEvents: 'none' }}>
+          
+          {/* NAV AMB MARGES REDUÏTS */}
+          <nav style={{ 
+            display: 'flex', justifyContent: 'space-between', 
+            padding: '15px 25px', // Marges ajustats
+            fontFamily: 'var(--font-titol)', fontSize: '1rem', fontWeight: '700',
+            textTransform: 'uppercase', letterSpacing: '1px', pointerEvents: 'auto' 
+          }}>
+            <span className="interactive">Sergi Bosch Raga</span>
+            <span className="interactive" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>My Work</span>
+            <span className="interactive">Contact</span>
+          </nav>
+
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '0 20px' }}>
+            <h1 style={{ fontFamily: 'var(--font-cos)', fontSize: '1.2rem', maxWidth: '1000px', lineHeight: '1.5', pointerEvents: 'auto' }}>
+              <DecryptedText 
+                text="THIS DIGITAL SPACE FEATURES SOME OF MY WORK AND INTERESTS." 
+                speed={40} 
+                className="interactive"
+              />
+            </h1>
+            <div style={{ marginTop: '10px', pointerEvents: 'auto' }}>
+              <DecryptedText 
+                text="Feel Free To Explore The Projects!" 
+                speed={50}
+                className="interactive"
+                parentClassName="subtext"
+              />
+            </div>
+          </div>
+        </div>
+
+        <style jsx global>{`
+          :root {
+            --font-titol: 'Azaret Mono', monospace;
+            --font-cos: 'Chivo Mono', monospace;
+          }
+          body {
+            margin: 0;
+            background-color: #121212;
+            color: white;
+            cursor: none; /* Amaga el cursor a tota la web */
+          }
+          .subtext {
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 400;
+            font-family: var(--font-cos);
+          }
+          .interactive {
+            cursor: none; /* Per assegurar-nos que no surt el punter de Next.js */
+          }
+          /* Quan passem per sobre d'alguna cosa clicable, podem fer que el quadrat creixi */
+          .interactive:hover ~ #cursor {
+            transform: translate(-50%, -50%) scale(2);
+          }
+        `}</style>
+      </main>
+    </>
   );
 }
