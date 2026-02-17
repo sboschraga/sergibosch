@@ -2,7 +2,9 @@
 import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 
-function lerp(a, b, n) { return (1 - n) * a + n * b; }
+function lerp(a, b, n) { 
+  return (1 - n) * a + n * b; 
+}
 
 class TrailLogic {
   constructor(container) {
@@ -24,7 +26,11 @@ class TrailLogic {
   }
 
   render() {
-    const dist = Math.hypot(this.mousePos.x - this.lastMousePos.x, this.mousePos.y - this.lastMousePos.y);
+    const dist = Math.hypot(
+      this.mousePos.x - this.lastMousePos.x, 
+      this.mousePos.y - this.lastMousePos.y
+    );
+    
     this.cacheMousePos.x = lerp(this.cacheMousePos.x, this.mousePos.x, 0.1);
     this.cacheMousePos.y = lerp(this.cacheMousePos.y, this.mousePos.y, 0.1);
 
@@ -38,8 +44,13 @@ class TrailLogic {
   showNextImage() {
     const img = this.images[this.imgPosition];
     if (!img) return;
+
     this.imgPosition = (this.imgPosition + 1) % this.imagesTotal;
     this.zIndexVal++;
+
+    // Mides fixes per centrar la imatge respecte al ratolí
+    const w = 450;
+    const h = 300;
 
     gsap.killTweensOf(img);
     gsap.timeline()
@@ -48,20 +59,25 @@ class TrailLogic {
           opacity: 1,
           scale: 0.8,
           zIndex: this.zIndexVal,
-          x: this.cacheMousePos.x - 225, // Centrat (450/2)
-          y: this.cacheMousePos.y - 150  // Centrat (300/2)
+          // Treiem el posicionament de "pre-render" i el posem al ratolí
+          x: this.cacheMousePos.x - w / 2,
+          y: this.cacheMousePos.y - h / 2
         },
         {
           duration: 0.4,
           ease: 'expo.out',
-          x: this.mousePos.x - 225,
-          y: this.mousePos.y - 150
+          x: this.mousePos.x - w / 2,
+          y: this.mousePos.y - h / 2
         }
       )
       .to(img, {
         duration: 0.6,
-        opacity: 0.001, // Tornem a opacitat gairebé zero però no zero real
+        opacity: 0.01, // Tornem a un estat quasi invisible però actiu
         scale: 0.4,
+        onComplete: () => {
+          // Les enviem lluny un cop acabada l'animació per no bloquejar clics
+          gsap.set(img, { x: -2000, y: -2000 });
+        }
       }, 0.3);
   }
 }
@@ -82,7 +98,7 @@ export default function ImageTrail({ items = [] }) {
           key={url + i} 
           style={{ 
             position: 'absolute', 
-            opacity: 0.001, // IMPORTANT: No és 0, és una mica més per forçar el render
+            opacity: 0.01, // Clau per evitar el lag: el navegador la "pinta" encara que no es vegi
             width: '450px', 
             height: '300px',
             willChange: 'transform, opacity',
@@ -92,14 +108,20 @@ export default function ImageTrail({ items = [] }) {
             backgroundColor: '#1a1a1a',
             top: 0,
             left: 0,
-            transform: 'translate(-1000px, -1000px)' // Les amaguem lluny però el navegador les "pinta"
+            // Posició inicial fora de pantalla però "visible" pel sistema
+            transform: 'translate(-2000px, -2000px)' 
           }}
         >
           <img 
             src={url} 
             alt="" 
-            loading="eager"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            loading="eager" // Força la descàrrega immediata
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'cover',
+              display: 'block'
+            }} 
           />
         </div>
       ))}
