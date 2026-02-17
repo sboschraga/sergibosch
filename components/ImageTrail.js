@@ -2,9 +2,7 @@
 import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 
-function lerp(a, b, n) {
-  return (1 - n) * a + n * b;
-}
+function lerp(a, b, n) { return (1 - n) * a + n * b; }
 
 class TrailLogic {
   constructor(container) {
@@ -18,33 +16,11 @@ class TrailLogic {
     this.lastMousePos = { x: 0, y: 0 };
     this.cacheMousePos = { x: 0, y: 0 };
 
-    // FASE D'ESCALFAMENT: Força el processament de píxels
-    this.preWarmImages();
-
     window.addEventListener('mousemove', ev => {
       this.mousePos = { x: ev.clientX, y: ev.clientY };
     }, { passive: true });
 
     requestAnimationFrame(() => this.render());
-  }
-
-  preWarmImages() {
-    // Posem totes les imatges al centre amb opacitat mínima un instant
-    this.images.forEach((img) => {
-      gsap.set(img, {
-        opacity: 0.01,
-        x: window.innerWidth / 2 - 225, // Centre aproximat
-        y: window.innerHeight / 2 - 150,
-        top: 0,
-        left: 0,
-        display: 'block'
-      });
-    });
-    
-    // Les tornem a moure fora passats 150ms
-    setTimeout(() => {
-      this.images.forEach(img => gsap.set(img, { opacity: 0, top: -2000 }));
-    }, 150);
   }
 
   render() {
@@ -62,39 +38,30 @@ class TrailLogic {
   showNextImage() {
     const img = this.images[this.imgPosition];
     if (!img) return;
-    
     this.imgPosition = (this.imgPosition + 1) % this.imagesTotal;
     this.zIndexVal++;
-
-    const w = 450;
-    const h = 300;
 
     gsap.killTweensOf(img);
     gsap.timeline()
       .fromTo(img, 
         {
-          top: 0, // Anul·lem el -2000px
-          left: 0,
           opacity: 1,
           scale: 0.8,
           zIndex: this.zIndexVal,
-          x: this.cacheMousePos.x - w / 2,
-          y: this.cacheMousePos.y - h / 2
+          x: this.cacheMousePos.x - 225, // Centrat (450/2)
+          y: this.cacheMousePos.y - 150  // Centrat (300/2)
         },
         {
           duration: 0.4,
           ease: 'expo.out',
-          x: this.mousePos.x - w / 2,
-          y: this.mousePos.y - h / 2
+          x: this.mousePos.x - 225,
+          y: this.mousePos.y - 150
         }
       )
       .to(img, {
         duration: 0.6,
-        opacity: 0,
+        opacity: 0.001, // Tornem a opacitat gairebé zero però no zero real
         scale: 0.4,
-        onComplete: () => {
-          gsap.set(img, { top: -2000 }); // Netegem per no interferir
-        }
       }, 0.3);
   }
 }
@@ -115,7 +82,7 @@ export default function ImageTrail({ items = [] }) {
           key={url + i} 
           style={{ 
             position: 'absolute', 
-            opacity: 0, 
+            opacity: 0.001, // IMPORTANT: No és 0, és una mica més per forçar el render
             width: '450px', 
             height: '300px',
             willChange: 'transform, opacity',
@@ -123,16 +90,16 @@ export default function ImageTrail({ items = [] }) {
             borderRadius: '10px',
             boxShadow: '0 15px 50px rgba(0,0,0,0.6)',
             backgroundColor: '#1a1a1a',
-            top: '-2000px',
-            visibility: 'visible'
+            top: 0,
+            left: 0,
+            transform: 'translate(-1000px, -1000px)' // Les amaguem lluny però el navegador les "pinta"
           }}
         >
           <img 
             src={url} 
             alt="" 
             loading="eager"
-            decoding="sync"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
           />
         </div>
       ))}
