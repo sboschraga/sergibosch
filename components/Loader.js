@@ -13,21 +13,23 @@ export default function Loader({ items, onFinished }) {
     let loadedCount = 0;
     const totalItems = items.length;
 
-    const updateProgress = () => {
-      loadedCount++;
-      const currentProgress = Math.round((loadedCount / totalItems) * 100);
-      setProgress(currentProgress);
-      if (loadedCount === totalItems) {
-        setTimeout(onFinished, 600);
-      }
-    };
-
     items.forEach((url) => {
       const img = new Image();
       img.src = url;
+      
+      // Intentem descodificar la imatge abans de comptar-la com a llista
       img.decode()
-        .then(() => updateProgress())
-        .catch(() => updateProgress());
+        .then(() => {
+          loadedCount++;
+          setProgress(Math.round((loadedCount / totalItems) * 100));
+          if (loadedCount === totalItems) {
+            setTimeout(onFinished, 800); // Una mica més de marge per seguretat
+          }
+        })
+        .catch(() => {
+          loadedCount++; // Encara que falli, seguim perquè el loader no s'encalli
+          if (loadedCount === totalItems) onFinished();
+        });
     });
   }, [items, onFinished]);
 
@@ -37,15 +39,12 @@ export default function Loader({ items, onFinished }) {
       display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
       color: 'white', fontFamily: 'var(--font-titol)'
     }}>
-      <div style={{ fontSize: '5rem', fontWeight: '700', fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px' }}>
+      <div style={{ fontSize: '6rem', fontWeight: '700', letterSpacing: '-2px' }}>
         {progress}%
       </div>
-      <div style={{ width: '240px', height: '2px', backgroundColor: '#222', marginTop: '20px', overflow: 'hidden' }}>
-        <div style={{ height: '100%', backgroundColor: 'white', width: `${progress}%`, transition: 'width 0.3s ease-out' }} />
+      <div style={{ width: '300px', height: '2px', backgroundColor: '#222', marginTop: '20px' }}>
+        <div style={{ height: '100%', backgroundColor: 'white', width: `${progress}%`, transition: 'width 0.4s ease-out' }} />
       </div>
-      <p style={{ marginTop: '20px', fontSize: '0.7rem', color: '#555', letterSpacing: '3px', textTransform: 'uppercase' }}>
-        Optimizing Experience
-      </p>
     </div>
   );
 }
