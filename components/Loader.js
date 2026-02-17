@@ -13,25 +13,13 @@ export default function Loader({ items, onFinished }) {
     let loadedCount = 0;
     const totalItems = items.length;
 
-    items.forEach((url) => {
-      const img = new Image();
-      img.src = url;
-      
-      // Aquesta és la clau: .decode() força al navegador a processar els píxels
-      // i guardar-los a la memòria RAM/GPU abans de continuar.
-      img.decode()
-        .then(() => {
-          loadedCount++;
-          setProgress(Math.round((loadedCount / totalItems) * 100));
-          if (loadedCount === totalItems) {
-            setTimeout(onFinished, 1000); // Donem un segon extra de seguretat
-          }
-        })
-        .catch((err) => {
-          console.error("Error descodificant:", url, err);
-          loadedCount++; // Seguim encara que falli una
-          if (loadedCount === totalItems) onFinished();
-        });
+    // Dins de la lògica del Loader.js, manté això:
+items.forEach((url) => {
+  const img = new Image();
+  img.src = url;
+  img.decode()
+    .then(() => updateProgress())
+    .catch(() => updateProgress());
     });
   }, [items, onFinished]);
 

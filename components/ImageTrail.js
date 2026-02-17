@@ -13,7 +13,7 @@ class TrailLogic {
     this.imagesTotal = this.images.length;
     this.imgPosition = 0;
     this.zIndexVal = 10;
-    this.threshold = 75; 
+    this.threshold = 80; // Sensibilitat equilibrada
     this.mousePos = { x: 0, y: 0 };
     this.lastMousePos = { x: 0, y: 0 };
     this.cacheMousePos = { x: 0, y: 0 };
@@ -48,37 +48,38 @@ class TrailLogic {
     this.imgPosition = (this.imgPosition + 1) % this.imagesTotal;
     this.zIndexVal++;
 
-    // Mides fixes per centrar la imatge respecte al ratolí
+    // Mides per centrar el trail
     const w = 450;
     const h = 300;
 
     gsap.killTweensOf(img);
+    
     gsap.timeline()
-      .fromTo(img, 
-        {
-          opacity: 1,
-          scale: 0.8,
-          zIndex: this.zIndexVal,
-          // Treiem el posicionament de "pre-render" i el posem al ratolí
-          x: this.cacheMousePos.x - w / 2,
-          y: this.cacheMousePos.y - h / 2
-        },
-        {
-          duration: 0.4,
-          ease: 'expo.out',
-          x: this.mousePos.x - w / 2,
-          y: this.mousePos.y - h / 2
-        }
-      )
+      .set(img, {
+        display: 'block',
+        opacity: 0,
+        scale: 0.5,
+        zIndex: this.zIndexVal,
+        x: this.cacheMousePos.x - w / 2,
+        y: this.cacheMousePos.y - h / 2
+      })
+      .to(img, {
+        duration: 0.4,
+        ease: 'expo.out',
+        opacity: 1,
+        scale: 1,
+        x: this.mousePos.x - w / 2,
+        y: this.mousePos.y - h / 2
+      })
       .to(img, {
         duration: 0.6,
-        opacity: 0.01, // Tornem a un estat quasi invisible però actiu
-        scale: 0.4,
+        opacity: 0,
+        scale: 0.2,
+        ease: 'power2.inOut',
         onComplete: () => {
-          // Les enviem lluny un cop acabada l'animació per no bloquejar clics
-          gsap.set(img, { x: -2000, y: -2000 });
+          gsap.set(img, { display: 'none' });
         }
-      }, 0.3);
+      }, 0.2);
   }
 }
 
@@ -98,30 +99,21 @@ export default function ImageTrail({ items = [] }) {
           key={url + i} 
           style={{ 
             position: 'absolute', 
-            opacity: 0.01, // Clau per evitar el lag: el navegador la "pinta" encara que no es vegi
+            display: 'none', 
             width: '450px', 
             height: '300px',
-            willChange: 'transform, opacity',
             overflow: 'hidden',
             borderRadius: '10px',
-            boxShadow: '0 15px 50px rgba(0,0,0,0.6)',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
             backgroundColor: '#1a1a1a',
             top: 0,
-            left: 0,
-            // Posició inicial fora de pantalla però "visible" pel sistema
-            transform: 'translate(-2000px, -2000px)' 
+            left: 0
           }}
         >
           <img 
             src={url} 
             alt="" 
-            loading="eager" // Força la descàrrega immediata
-            style={{ 
-              width: '100%', 
-              height: '100%', 
-              objectFit: 'cover',
-              display: 'block'
-            }} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
           />
         </div>
       ))}
