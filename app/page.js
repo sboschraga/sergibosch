@@ -8,12 +8,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const projects = useMemo(() => ({
-    culactiu: ['/trail/Culactiu_1.png', '/trail/Culactiu_2.png', '/trail/Culactiu_3.png', '/trail/Culactiu_4.jpg', '/trail/Culactiu_5.jpg', '/trail/Culactiu_6.jpg', '/trail/Culactiu_7.jpg', '/trail/Culactiu_8.png', '/trail/Culactiu_9.png', '/trail/Culactiu_10.jpeg', '/trail/Culactiu_11.jpeg', '/trail/Culactiu_13.png', '/trail/Culactiu_14.png', '/trail/Culactiu_15.png', '/trail/Culactiu_16.png'],
-    cumulus: ['/trail/Cumulus_1.jpg', '/trail/Cumulus_2.jpg', '/trail/Cumulus_3.jpg', '/trail/Cumulus_4.jpg'],
-    doom: ['/trail/Doom_1.jpeg', '/trail/Doom_2.jpeg', '/trail/Doom_3.jpeg', '/trail/Doom_4.jpg', '/trail/Doom_5.jpeg', '/trail/Doom_6.jpeg'],
-    malreal: ['/trail/Malreal_1.png', '/trail/Malreal_2.png', '/trail/Malreal_3.png', '/trail/Malreal_4.jpg', '/trail/Malreal_5.jpg'],
-    relationships: ['/trail/Relationships_1.JPG', '/trail/Relationships_2.JPG', '/trail/Relationships_3.JPG', '/trail/Relationships_4.JPG'],
-    vasudeva: ['/trail/Vasudeva_3.png', '/trail/Vasudeva_4.png', '/trail/Vasudeva_5.png', '/trail/Vasudeva_6.png']
+    culactiu: ['/trail/Culactiu_1.webp', '/trail/Culactiu_2.webp', '/trail/Culactiu_3.webp', '/trail/Culactiu_4.webp', '/trail/Culactiu_5.webp', '/trail/Culactiu_6.webp', '/trail/Culactiu_7.webp', '/trail/Culactiu_8.webp', '/trail/Culactiu_9.webp', '/trail/Culactiu_10.webp', '/trail/Culactiu_11.webp', '/trail/Culactiu_13.webp', '/trail/Culactiu_14.webp', '/trail/Culactiu_15.webp', '/trail/Culactiu_16.webp'],
+    cumulus: ['/trail/Cumulus_1.webp', '/trail/Cumulus_2.webp', '/trail/Cumulus_3.webp', '/trail/Cumulus_4.webp'],
+    doom: ['/trail/Doom_1.webp', '/trail/Doom_2.webp', '/trail/Doom_3.webp', '/trail/Doom_4.webp', '/trail/Doom_5.webp', '/trail/Doom_6.webp'],
+    malreal: ['/trail/Malreal_1.webp', '/trail/Malreal_2.webp', '/trail/Malreal_3.webp', '/trail/Malreal_4.webp', '/trail/Malreal_5.webp'],
+    relationships: ['/trail/Relationships_1.webp', '/trail/Relationships_2.webp', '/trail/Relationships_3.webp', '/trail/Relationships_4.webp'],
+    vasudeva: ['/trail/Vasudeva_3.webp', '/trail/Vasudeva_4.webp', '/trail/Vasudeva_5.webp', '/trail/Vasudeva_6.webp']
   }), []);
 
   const interleavedList = useMemo(() => {
