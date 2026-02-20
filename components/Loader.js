@@ -1,74 +1,77 @@
 'use client';
 import { useEffect, useState } from 'react';
 
-export default function Loader({ items, onFinished }) {
+export default function Loader({ onFinished }) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (!items || items.length === 0) {
-      onFinished();
-      return;
-    }
+    let start = 0;
+    const duration = 1500; // Durada total de l'animació (2.5 segons)
+    const intervalTime = 20; 
+    const totalSteps = duration / intervalTime;
+    const increment = 100 / totalSteps;
 
-    let loadedCount = 0;
-    const totalItems = items.length;
-
-    const updateProgress = () => {
-      loadedCount++;
-      const currentProgress = Math.round((loadedCount / totalItems) * 100);
-      setProgress(currentProgress);
-
-      if (loadedCount === totalItems) {
-        // Donem un marge extra per assegurar que la GPU ha acabat de processar
-        setTimeout(onFinished, 800);
-      }
-    };
-
-    items.forEach((url) => {
-      const img = new Image();
-      img.src = url;
+    const timer = setInterval(() => {
+      start += increment;
+      const displayValue = Math.min(Math.round(start), 100);
       
-      img.decode()
-        .then(() => {
-          // TÈCNICA AVANÇADA: Forçar el renderitzat en un canvas invisible
-          try {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 1;
-            canvas.height = 1;
-            // En dibuixar-la, la GPU ha de processar els píxels sí o sí
-            ctx.drawImage(img, 0, 0, 1, 1);
-          } catch (e) {
-            console.error("Canvas render error", e);
-          }
-          updateProgress();
-        })
-        .catch((err) => {
-          console.error("Error descodificant:", url, err);
-          updateProgress();
-        });
-    });
-  }, [items, onFinished]);
+      setProgress(displayValue);
+
+      if (start >= 100) {
+        clearInterval(timer);
+        setTimeout(onFinished, 500); // Petita pausa al 100% per impacte visual
+      }
+    }, intervalTime);
+
+    return () => clearInterval(timer);
+  }, [onFinished]);
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, backgroundColor: '#121212', zIndex: 9999,
-      display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
-      color: 'white', fontFamily: 'var(--font-titol)'
+      position: 'fixed', 
+      inset: 0, 
+      backgroundColor: '#121212', 
+      zIndex: 9999,
+      display: 'flex', 
+      flexDirection: 'column', 
+      justifyContent: 'center', 
+      alignItems: 'center',
+      color: 'white', 
+      fontFamily: 'var(--font-titol)'
     }}>
-      <div style={{ fontSize: '6rem', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>
-        {progress}%
+      <div style={{ 
+        fontSize: '7rem', 
+        fontWeight: '800', 
+        fontVariantNumeric: 'tabular-nums', 
+        letterSpacing: '-5px',
+        lineHeight: 1
+      }}>
+        {progress}
       </div>
-      <div style={{ width: '300px', height: '2px', backgroundColor: '#222', marginTop: '20px' }}>
+
+      <div style={{ 
+        width: '120px', 
+        height: '1px', 
+        backgroundColor: '#333', 
+        marginTop: '20px',
+        overflow: 'hidden'
+      }}>
         <div style={{ 
           height: '100%', 
           backgroundColor: 'white', 
           width: `${progress}%`, 
-          transition: 'width 0.4s ease-out' 
+          transition: 'width 0.1s linear' 
         }} />
       </div>
-      <p style={{ marginTop: '20px', fontSize: '0.8rem', color: '#555', letterSpacing: '2px' }}>
-        WARMING UP GPU ASSETS
+
+      <p style={{ 
+        marginTop: '40px', 
+        fontSize: '0.65rem', 
+        color: '#444', 
+        letterSpacing: '5px',
+        textTransform: 'uppercase'
+      }}>
+        Loading Experience
       </p>
     </div>
   );

@@ -48,38 +48,39 @@ class TrailLogic {
     this.imgPosition = (this.imgPosition + 1) % this.imagesTotal;
     this.zIndexVal++;
 
-    const w = 450;
-    const h = 300;
+    const w = 350;
+    const h = 233;
 
     gsap.killTweensOf(img);
     
     gsap.timeline()
-      .fromTo(img, 
-        {
-          opacity: 1,
-          scale: 0.5,
-          zIndex: this.zIndexVal,
-          x: this.cacheMousePos.x - w / 2,
-          y: this.cacheMousePos.y - h / 2
-        },
-        {
-          duration: 0.4,
-          ease: 'expo.out',
-          scale: 1,
-          x: this.mousePos.x - w / 2,
-          y: this.mousePos.y - h / 2
-        }
-      )
+      .set(img, {
+        visibility: 'visible',
+        opacity: 0,
+        scale: 0.8,
+        zIndex: this.zIndexVal,
+        x: this.cacheMousePos.x - w / 2,
+        y: this.cacheMousePos.y - h / 2,
+        force3D: true
+      })
       .to(img, {
-        duration: 0.6,
-        opacity: 0.01, // Tornem a l'estat de pre-renderitzat
-        scale: 0.001,
+        duration: 0.4,
+        ease: 'expo.out',
+        opacity: 1,
+        scale: 1,
+        x: this.mousePos.x - w / 2,
+        y: this.mousePos.y - h / 2
+      })
+      // AQUEST ÉS EL BLOC QUE CONTROLA LA SORTIDA
+      .to(img, {
+        duration: 0.8,      // Abans 0.5 (ara desapareix més lentament)
+        opacity: 0,
+        scale: 0.8,        // Abans 0.5 (fa un efecte de zoom-out més suau)
         ease: 'power2.inOut',
         onComplete: () => {
-          // No fem display:none ni les movem a -2000px per mantenir-les a la GPU
-          gsap.set(img, { x: 0, y: 0 });
+          gsap.set(img, { visibility: 'hidden' });
         }
-      }, 0.2);
+      }, 0.3); // AQUEST NÚMERO ÉS LA CLAU: Abans 0.2 (ara espera més a començar a marxar)
   }
 }
 
@@ -99,23 +100,27 @@ export default function ImageTrail({ items = [] }) {
           key={url + i} 
           style={{ 
             position: 'absolute', 
-            opacity: 0.01, // Manté la imatge "viva" pel navegador
-            width: '450px', 
-            height: '300px',
+            visibility: 'hidden', 
+            width: '350px', 
+            height: '233px', 
             overflow: 'hidden',
-            borderRadius: '10px',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+            borderRadius: '6px', 
+            boxShadow: '0 8px 25px rgba(0,0,0,0.5)',
             backgroundColor: '#1a1a1a',
             top: 0,
             left: 0,
-            transform: 'scale(0.001)', // Quasi invisible però existent
             willChange: 'transform, opacity'
           }}
         >
           <img 
             src={url} 
             alt="" 
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'cover',
+              display: 'block'
+            }} 
           />
         </div>
       ))}

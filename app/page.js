@@ -8,12 +8,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const projects = useMemo(() => ({
-    culactiu: ['/trail/Culactiu_1.webp', '/trail/Culactiu_2.webp', '/trail/Culactiu_3.webp', '/trail/Culactiu_4.webp', '/trail/Culactiu_5.webp', '/trail/Culactiu_6.webp', '/trail/Culactiu_7.webp', '/trail/Culactiu_8.webp', '/trail/Culactiu_9.webp', '/trail/Culactiu_11.webp', '/trail/Culactiu_12.webp', '/trail/Culactiu_13.webp', '/trail/Culactiu_14.webp', '/trail/Culactiu_15.webp'],
-    cumulus: ['/trail/Cumulus_1.webp', '/trail/Cumulus_2.webp', '/trail/Cumulus_3.webp', '/trail/Cumulus_4.webp'],
-    doom: ['/trail/Doom_1.webp', '/trail/Doom_2.webp', '/trail/Doom_3.webp', '/trail/Doom_4.webp', '/trail/Doom_5.webp', '/trail/Doom_6.webp'],
-    malreal: ['/trail/Malreal_1.webp', '/trail/Malreal_2.webp', '/trail/Malreal_3.webp', '/trail/Malreal_4.webp', '/trail/Malreal_5.webp'],
-    relationships: ['/trail/Relationships_1.webp', '/trail/Relationships_2.webp', '/trail/Relationships_3.webp', '/trail/Relationships_4.webp'],
-    vasudeva: ['/trail/Vasudeva_3.webp', '/trail/Vasudeva_4.webp', '/trail/Vasudeva_5.webp', '/trail/Vasudeva_6.webp']
+    culactiu: ['/trail/Culactiu_1.jpg', '/trail/Culactiu_2.jpg', '/trail/Culactiu_3.jpg', '/trail/Culactiu_4.jpg', '/trail/Culactiu_5.jpg', '/trail/Culactiu_6.jpg', '/trail/Culactiu_7.jpg', '/trail/Culactiu_8.jpg', '/trail/Culactiu_9.jpg', '/trail/Culactiu_11.jpg', '/trail/Culactiu_12.jpg', '/trail/Culactiu_13.jpg', '/trail/Culactiu_14.jpg', '/trail/Culactiu_15.jpg'],
+    cumulus: ['/trail/Cumulus_1.jpg', '/trail/Cumulus_2.jpg', '/trail/Cumulus_3.jpg', '/trail/Cumulus_4.jpg'],
+    doom: ['/trail/Doom_1.jpg', '/trail/Doom_2.jpg', '/trail/Doom_3.jpg', '/trail/Doom_4.jpg', '/trail/Doom_5.jpg', '/trail/Doom_6.jpg'],
+    malreal: ['/trail/Malreal_1.jpg', '/trail/Malreal_2.jpg', '/trail/Malreal_3.jpg', '/trail/Malreal_4.jpg', '/trail/Malreal_5.jpg'],
+    relationships: ['/trail/Relationships_1.jpg', '/trail/Relationships_2.jpg', '/trail/Relationships_3.jpg', '/trail/Relationships_4.jpg'],
+    vasudeva: ['/trail/Vasudeva_3.jpg', '/trail/Vasudeva_4.jpg', '/trail/Vasudeva_5.jpg', '/trail/Vasudeva_6.jpg']
   }), []);
 
   const interleavedList = useMemo(() => {
@@ -28,7 +28,7 @@ export default function Home() {
 
   return (
     <>
-      {loading && <Loader items={interleavedList} onFinished={() => setLoading(false)} />}
+      {loading && <Loader onFinished={() => setLoading(false)} />}
       
       <main style={{ 
         height: '100vh', width: '100vw', position: 'relative', backgroundColor: '#121212', 
