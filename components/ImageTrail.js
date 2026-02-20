@@ -26,7 +26,11 @@ class TrailLogic {
   }
 
   render() {
-    const dist = Math.hypot(this.mousePos.x - this.lastMousePos.x, this.mousePos.y - this.lastMousePos.y);
+    const dist = Math.hypot(
+      this.mousePos.x - this.lastMousePos.x, 
+      this.mousePos.y - this.lastMousePos.y
+    );
+    
     this.cacheMousePos.x = lerp(this.cacheMousePos.x, this.mousePos.x, 0.1);
     this.cacheMousePos.y = lerp(this.cacheMousePos.y, this.mousePos.y, 0.1);
 
@@ -52,12 +56,11 @@ class TrailLogic {
     gsap.timeline()
       .fromTo(img, 
         {
-          opacity: 1, // Ara l'animació comença des d'aquí
+          opacity: 1,
           scale: 0.5,
           zIndex: this.zIndexVal,
           x: this.cacheMousePos.x - w / 2,
-          y: this.cacheMousePos.y - h / 2,
-          visibility: 'visible' // Fem que aparegui
+          y: this.cacheMousePos.y - h / 2
         },
         {
           duration: 0.4,
@@ -69,12 +72,12 @@ class TrailLogic {
       )
       .to(img, {
         duration: 0.6,
-        opacity: 0,
-        scale: 0.2,
+        opacity: 0.01, // Tornem a l'estat de pre-renderitzat
+        scale: 0.001,
         ease: 'power2.inOut',
         onComplete: () => {
-          // IMPORTANT: No fem display: none, només les movem lluny
-          gsap.set(img, { x: -2000, y: -2000 });
+          // No fem display:none ni les movem a -2000px per mantenir-les a la GPU
+          gsap.set(img, { x: 0, y: 0 });
         }
       }, 0.2);
   }
@@ -96,7 +99,7 @@ export default function ImageTrail({ items = [] }) {
           key={url + i} 
           style={{ 
             position: 'absolute', 
-            opacity: 0, // Invisibles a l'inici
+            opacity: 0.01, // Manté la imatge "viva" pel navegador
             width: '450px', 
             height: '300px',
             overflow: 'hidden',
@@ -105,8 +108,7 @@ export default function ImageTrail({ items = [] }) {
             backgroundColor: '#1a1a1a',
             top: 0,
             left: 0,
-            // Truc: les mantenim lluny però amb visibilitat perquè el navegador les processi
-            transform: 'translate(-2000px, -2000px)',
+            transform: 'scale(0.001)', // Quasi invisible però existent
             willChange: 'transform, opacity'
           }}
         >

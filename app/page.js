@@ -8,7 +8,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const projects = useMemo(() => ({
-    culactiu: ['/trail/Culactiu_1.webp', '/trail/Culactiu_2.webp', '/trail/Culactiu_3.webp', '/trail/Culactiu_4.webp', '/trail/Culactiu_5.webp', '/trail/Culactiu_6.webp', '/trail/Culactiu_7.webp', '/trail/Culactiu_8.webp', '/trail/Culactiu_9.webp', '/trail/Culactiu_10.webp', '/trail/Culactiu_11.webp', '/trail/Culactiu_13.webp', '/trail/Culactiu_14.webp', '/trail/Culactiu_15.webp', '/trail/Culactiu_16.webp'],
+    culactiu: ['/trail/Culactiu_1.webp', '/trail/Culactiu_2.webp', '/trail/Culactiu_3.webp', '/trail/Culactiu_4.webp', '/trail/Culactiu_5.webp', '/trail/Culactiu_6.webp', '/trail/Culactiu_7.webp', '/trail/Culactiu_8.webp', '/trail/Culactiu_9.webp', '/trail/Culactiu_11.webp', '/trail/Culactiu_12.webp', '/trail/Culactiu_13.webp', '/trail/Culactiu_14.webp', '/trail/Culactiu_15.webp'],
     cumulus: ['/trail/Cumulus_1.webp', '/trail/Cumulus_2.webp', '/trail/Cumulus_3.webp', '/trail/Cumulus_4.webp'],
     doom: ['/trail/Doom_1.webp', '/trail/Doom_2.webp', '/trail/Doom_3.webp', '/trail/Doom_4.webp', '/trail/Doom_5.webp', '/trail/Doom_6.webp'],
     malreal: ['/trail/Malreal_1.webp', '/trail/Malreal_2.webp', '/trail/Malreal_3.webp', '/trail/Malreal_4.webp', '/trail/Malreal_5.webp'],
