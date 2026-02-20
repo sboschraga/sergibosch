@@ -13,7 +13,7 @@ class TrailLogic {
     this.imagesTotal = this.images.length;
     this.imgPosition = 0;
     this.zIndexVal = 10;
-    this.threshold = 80; // Sensibilitat equilibrada
+    this.threshold = 80; 
     this.mousePos = { x: 0, y: 0 };
     this.lastMousePos = { x: 0, y: 0 };
     this.cacheMousePos = { x: 0, y: 0 };
@@ -26,11 +26,7 @@ class TrailLogic {
   }
 
   render() {
-    const dist = Math.hypot(
-      this.mousePos.x - this.lastMousePos.x, 
-      this.mousePos.y - this.lastMousePos.y
-    );
-    
+    const dist = Math.hypot(this.mousePos.x - this.lastMousePos.x, this.mousePos.y - this.lastMousePos.y);
     this.cacheMousePos.x = lerp(this.cacheMousePos.x, this.mousePos.x, 0.1);
     this.cacheMousePos.y = lerp(this.cacheMousePos.y, this.mousePos.y, 0.1);
 
@@ -48,36 +44,37 @@ class TrailLogic {
     this.imgPosition = (this.imgPosition + 1) % this.imagesTotal;
     this.zIndexVal++;
 
-    // Mides per centrar el trail
     const w = 450;
     const h = 300;
 
     gsap.killTweensOf(img);
     
     gsap.timeline()
-      .set(img, {
-        display: 'block',
-        opacity: 0,
-        scale: 0.5,
-        zIndex: this.zIndexVal,
-        x: this.cacheMousePos.x - w / 2,
-        y: this.cacheMousePos.y - h / 2
-      })
-      .to(img, {
-        duration: 0.4,
-        ease: 'expo.out',
-        opacity: 1,
-        scale: 1,
-        x: this.mousePos.x - w / 2,
-        y: this.mousePos.y - h / 2
-      })
+      .fromTo(img, 
+        {
+          opacity: 1, // Ara l'animació comença des d'aquí
+          scale: 0.5,
+          zIndex: this.zIndexVal,
+          x: this.cacheMousePos.x - w / 2,
+          y: this.cacheMousePos.y - h / 2,
+          visibility: 'visible' // Fem que aparegui
+        },
+        {
+          duration: 0.4,
+          ease: 'expo.out',
+          scale: 1,
+          x: this.mousePos.x - w / 2,
+          y: this.mousePos.y - h / 2
+        }
+      )
       .to(img, {
         duration: 0.6,
         opacity: 0,
         scale: 0.2,
         ease: 'power2.inOut',
         onComplete: () => {
-          gsap.set(img, { display: 'none' });
+          // IMPORTANT: No fem display: none, només les movem lluny
+          gsap.set(img, { x: -2000, y: -2000 });
         }
       }, 0.2);
   }
@@ -99,7 +96,7 @@ export default function ImageTrail({ items = [] }) {
           key={url + i} 
           style={{ 
             position: 'absolute', 
-            display: 'none', 
+            opacity: 0, // Invisibles a l'inici
             width: '450px', 
             height: '300px',
             overflow: 'hidden',
@@ -107,7 +104,10 @@ export default function ImageTrail({ items = [] }) {
             boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
             backgroundColor: '#1a1a1a',
             top: 0,
-            left: 0
+            left: 0,
+            // Truc: les mantenim lluny però amb visibilitat perquè el navegador les processi
+            transform: 'translate(-2000px, -2000px)',
+            willChange: 'transform, opacity'
           }}
         >
           <img 
