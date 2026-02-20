@@ -10,7 +10,7 @@ const styles = {
 export default function DecryptedText({
   text,
   speed = 50,
-  characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+',
+  characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+1234567890',
   className = '',
   parentClassName = '',
   encryptedClassName = '',
