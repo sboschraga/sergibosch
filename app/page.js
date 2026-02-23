@@ -9,29 +9,30 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  
+  // AQUESTA ÉS LA CLAU: Estat per saber si el ratolí està sobre el menú
+  const [isHoveringMenu, setIsHoveringMenu] = useState(false);
 
-  // Lògica per amagar/mostrar el Nav segons l'scroll
   useEffect(() => {
     const controlNavbar = () => {
       if (window.scrollY > lastScrollY && window.scrollY > 100) { 
-        setShowNav(false); // Baixant: amaguem
+        setShowNav(false);
       } else { 
-        setShowNav(true);  // Pujant: mostrem
+        setShowNav(true);
       }
       setLastScrollY(window.scrollY);
     };
-
     window.addEventListener('scroll', controlNavbar);
     return () => window.removeEventListener('scroll', controlNavbar);
   }, [lastScrollY]);
 
   const demoItems = [
-    { link: '#', text: 'Culactiu', image: '/trail/Culactiu_1.jpg' },
-    { link: '#', text: 'Cumulus', image: '/trail/Cumulus_1.jpg' },
-    { link: '#', text: 'Doom', image: '/trail/Doom_1.jpg' },
-    { link: '#', text: 'Malreal', image: '/trail/Malreal_1.jpg' },
-    { link: '#', text: 'Relationships', image: '/trail/Relationships_1.jpg' },
-    { link: '#', text: 'Vasudeva', image: '/trail/Vasudeva_3.jpg' }
+    { link: '#', text: 'The Doom Race', image: '/trail/Doom_1.jpg' },
+    { link: '#', text: 'Vasudeva', image: '/trail/Vasudeva_3.jpg' },
+    { link: '#', text: 'Culactiu', image: '/trail/Culactiu_11.jpg' },
+    { link: '#', text: 'Phubbing', image: '/trail/Relationships_3.jpg' },
+    { link: '#', text: 'Malreal', image: '/trail/Malreal_4.jpg' },
+    { link: '#', text: 'Cumulus Workshop', image: '/trail/Cumulus_3.jpg' },
   ];
 
   const projects = useMemo(() => ({
@@ -53,17 +54,12 @@ export default function Home() {
     return result;
   }, [projects]);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <>
       {loading && <Loader onFinished={() => setLoading(false)} />}
       
-      <main style={{ width: '100vw', backgroundColor: '#121212', opacity: loading ? 0 : 1, transition: 'opacity 0.8s ease-in-out' }}>
+      <main style={{ width: '100vw', backgroundColor: '#121212', opacity: loading ? 0 : 1, transition: 'opacity 0.8s ease' }}>
         
-        {/* NAV FIXE INTEL·LIGENT */}
         <nav style={{ 
           position: 'fixed', top: 0, width: '100%', zIndex: 100,
           display: 'flex', justifyContent: 'space-between', padding: '20px 30px', 
@@ -71,19 +67,22 @@ export default function Home() {
           textTransform: 'uppercase', letterSpacing: '1px',
           transform: showNav ? 'translateY(0)' : 'translateY(-100%)',
           transition: 'transform 0.4s ease-in-out',
-          mixBlendMode: 'difference' // Perquè es vegi bé sobre fons clar/fosc
+          mixBlendMode: 'difference'
         }}>
-          <span onClick={scrollToTop} style={{ cursor: 'pointer', pointerEvents: 'auto' }}>Sergi Bosch Raga</span>
-          <span style={{ cursor: 'pointer', pointerEvents: 'auto' }}>Contact</span>
+          <span onClick={() => window.scrollTo({top:0, behavior:'smooth'})} style={{ cursor: 'pointer' }}>Sergi Bosch Raga</span>
+          <span style={{ cursor: 'pointer' }}>Contact</span>
         </nav>
 
         {/* SECCIÓ 1: HERO */}
         <section style={{ height: '100vh', width: '100vw', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)', backgroundSize: '30px 30px', zIndex: 0 }} />
           
-          <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
-            <ImageTrail items={interleavedList} />
-          </div>
+          {/* EL TRAIL NOMÉS ES MOSTRA SI EL RATOLÍ NO ESTÀ SOBRE EL MENÚ */}
+          {!isHoveringMenu && (
+            <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+              <ImageTrail items={interleavedList} />
+            </div>
+          )}
 
           <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', flexDirection: 'column', pointerEvents: 'none' }}>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '0 20px' }}>
@@ -97,36 +96,33 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECCIÓ 2: GALERIA (Aquí el Trail s'atura automàticament perquè està fora del Hero) */}
-        <section style={{ height: '100vh', width: '100vw', position: 'relative' }}>
-          <FlowingMenu 
-            items={demoItems}
-            speed={15}
-            textColor="#ffffff"
-            bgColor="#121212"
-            marqueeBgColor="#ffffff"
-            marqueeTextColor="#121212"
-            borderColor="#222222"
-          />
-        </section>
+        {/* SECCIÓ 2: GALERIA - Aquí detectem el ratolí */}
+<section 
+  onMouseEnter={() => setIsHoveringMenu(true)}
+  onMouseLeave={() => setIsHoveringMenu(false)}
+  style={{ 
+    height: '100vh', 
+    width: '100vw', 
+    position: 'relative', 
+    backgroundColor: '#121212', 
+    zIndex: 10 
+  }}
+>
+  <FlowingMenu 
+    items={demoItems} 
+    speed={15} 
+    bgColor="#121212" 
+    textColor="#fff"
+    marqueeBgColor="#fff"
+    marqueeTextColor="#121212"
+    borderColor="#222"
+  />
+</section>
 
         <style jsx global>{`
-          :root {
-            --font-titol: 'Azaret Mono', monospace;
-            --font-cos: 'Chivo Mono', monospace;
-          }
-          body {
-            margin: 0;
-            background-color: #121212;
-            color: white;
-            overflow-x: hidden;
-          }
-          .subtext {
-            color: #888;
-            font-size: 1.1rem;
-            font-weight: 400;
-            font-family: var(--font-cos);
-          }
+          :root { --font-titol: 'Azaret Mono', monospace; --font-cos: 'Chivo Mono', monospace; }
+          body { margin: 0; background-color: #121212; color: white; overflow-x: hidden; scroll-behavior: smooth; }
+          .subtext { color: #fff; font-size: 1.1rem; font-weight: 400; font-family: var(--font-cos); }
         `}</style>
       </main>
     </>
