@@ -9,15 +9,14 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  
-  // AQUESTA ÉS LA CLAU: Estat per saber si el ratolí està sobre el menú
   const [isHoveringMenu, setIsHoveringMenu] = useState(false);
+  const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
     const controlNavbar = () => {
-      if (window.scrollY > lastScrollY && window.scrollY > 100) { 
+      if (window.scrollY > lastScrollY && window.scrollY > 100) {
         setShowNav(false);
-      } else { 
+      } else {
         setShowNav(true);
       }
       setLastScrollY(window.scrollY);
@@ -26,8 +25,14 @@ export default function Home() {
     return () => window.removeEventListener('scroll', controlNavbar);
   }, [lastScrollY]);
 
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
+
   const demoItems = [
-    { link: '#', text: 'The Doom Race', image: '/trail/Doom_1.jpg' },
+    { link: '/doom', text: 'The Doom Race', image: '/trail/Doom_1.jpg' },
     { link: '#', text: 'Vasudeva', image: '/trail/Vasudeva_3.jpg' },
     { link: '#', text: 'Culactiu', image: '/trail/Culactiu_11.jpg' },
     { link: '#', text: 'Phubbing', image: '/trail/Relationships_3.jpg' },
@@ -58,26 +63,57 @@ export default function Home() {
     <>
       {loading && <Loader onFinished={() => setLoading(false)} />}
       
-      <main style={{ width: '100vw', backgroundColor: '#121212', opacity: loading ? 0 : 1, transition: 'opacity 0.8s ease' }}>
+      <main style={{ 
+        width: '100vw', 
+        backgroundColor: 'var(--background)', 
+        opacity: loading ? 0 : 1, 
+        transition: 'opacity 0.8s ease, background-color 0.3s ease' 
+      }}>
         
         <nav style={{ 
           position: 'fixed', top: 0, width: '100%', zIndex: 100,
-          display: 'flex', justifyContent: 'space-between', padding: '20px 30px', 
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 30px', 
           fontFamily: 'var(--font-titol)', fontSize: '1.2rem', fontWeight: '700',
           textTransform: 'uppercase', letterSpacing: '1px',
           transform: showNav ? 'translateY(0)' : 'translateY(-100%)',
           transition: 'transform 0.4s ease-in-out',
-          mixBlendMode: 'difference'
+          color: 'var(--nav-text)'
         }}>
-          <span onClick={() => window.scrollTo({top:0, behavior:'smooth'})} style={{ cursor: 'pointer' }}>Sergi Bosch Raga</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <span onClick={() => window.scrollTo({top:0, behavior:'smooth'})} style={{ cursor: 'pointer' }}>
+              Sergi Bosch Raga
+            </span>
+            <button 
+              onClick={toggleTheme}
+              style={{
+                background: 'none',
+                border: '1px solid var(--border-color)',
+                borderRadius: '20px',
+                padding: '4px 12px',
+                fontSize: '0.7rem',
+                cursor: 'pointer',
+                color: 'var(--nav-text)',
+                fontFamily: 'var(--font-cos)',
+                textTransform: 'uppercase',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {theme === 'dark' ? 'Light' : 'Dark'}
+            </button>
+          </div>
           <span style={{ cursor: 'pointer' }}>Contact</span>
         </nav>
 
-        {/* SECCIÓ 1: HERO */}
         <section style={{ height: '100vh', width: '100vw', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)', backgroundSize: '30px 30px', zIndex: 0 }} />
+          <div style={{ 
+            position: 'absolute', 
+            inset: 0, 
+            backgroundImage: `radial-gradient(circle, ${theme === 'dark' ? '#333' : '#ccc'} 1px, transparent 1px)`, 
+            backgroundSize: '30px 30px', 
+            zIndex: 0,
+            transition: 'background-image 0.3s ease'
+          }} />
           
-          {/* EL TRAIL NOMÉS ES MOSTRA SI EL RATOLÍ NO ESTÀ SOBRE EL MENÚ */}
           {!isHoveringMenu && (
             <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
               <ImageTrail items={interleavedList} />
@@ -86,7 +122,7 @@ export default function Home() {
 
           <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', flexDirection: 'column', pointerEvents: 'none' }}>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '0 20px' }}>
-              <h1 style={{ fontFamily: 'var(--font-cos)', fontSize: '1.5rem', maxWidth: '1100px', lineHeight: '1.4', pointerEvents: 'auto' }}>
+              <h1 style={{ color: 'var(--foreground)', fontFamily: 'var(--font-cos)', fontSize: '1.5rem', maxWidth: '1100px', lineHeight: '1.4', pointerEvents: 'auto' }}>
                 <DecryptedText text="THIS DIGITAL SPACE FEATURES SOME OF MY WORK AND INTERESTS." speed={40} />
               </h1>
               <div style={{ marginTop: '20px', pointerEvents: 'auto' }}>
@@ -96,33 +132,48 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECCIÓ 2: GALERIA - Aquí detectem el ratolí */}
-<section 
-  onMouseEnter={() => setIsHoveringMenu(true)}
-  onMouseLeave={() => setIsHoveringMenu(false)}
-  style={{ 
-    height: '100vh', 
-    width: '100vw', 
-    position: 'relative', 
-    backgroundColor: '#121212', 
-    zIndex: 10 
-  }}
->
-  <FlowingMenu 
-    items={demoItems} 
-    speed={15} 
-    bgColor="#121212" 
-    textColor="#fff"
-    marqueeBgColor="#fff"
-    marqueeTextColor="#121212"
-    borderColor="#222"
-  />
-</section>
+        <section 
+          onMouseEnter={() => setIsHoveringMenu(true)}
+          onMouseLeave={() => setIsHoveringMenu(false)}
+          style={{ 
+            height: '100vh', 
+            width: '100vw', 
+            position: 'relative', 
+            backgroundColor: 'var(--background)', 
+            zIndex: 10,
+            transition: 'background-color 0.3s ease'
+          }}
+        >
+          <FlowingMenu 
+            items={demoItems} 
+            speed={15}
+            bgColor="var(--background)"
+            textColor="var(--nav-text)"
+            marqueeBgColor="var(--nav-text)"
+            marqueeTextColor="var(--background)"
+            borderColor="var(--border-color)"
+          />
+        </section>
 
         <style jsx global>{`
-          :root { --font-titol: 'Azaret Mono', monospace; --font-cos: 'Chivo Mono', monospace; }
-          body { margin: 0; background-color: #121212; color: white; overflow-x: hidden; scroll-behavior: smooth; }
-          .subtext { color: #fff; font-size: 1.1rem; font-weight: 400; font-family: var(--font-cos); }
+          :root { 
+            --font-titol: 'Azaret Mono', monospace; 
+            --font-cos: 'Chivo Mono', monospace; 
+          }
+          body { 
+            margin: 0; 
+            background-color: var(--background); 
+            color: var(--foreground); 
+            overflow-x: hidden; 
+            scroll-behavior: smooth; 
+          }
+          .subtext { 
+            color: var(--subtext); 
+            font-size: 1.1rem; 
+            font-weight: 400; 
+            font-family: var(--font-cos); 
+            transition: color 0.3s ease; 
+          }
         `}</style>
       </main>
     </>

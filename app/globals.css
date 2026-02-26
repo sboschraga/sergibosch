@@ -1,27 +1,27 @@
+/* DEFINICIÓ DE VARIABLES I FONTS */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-titol: 'Azaret Mono', monospace;
+  --font-cos: 'Chivo Mono', monospace;
+
+  /* VARIABLES MODE FOSC (Per defecte) */
+  --background: #121212;
+  --foreground: #efefef;
+  --nav-text: #efefef;
+  --border-color: #222222;
+  --subtext: #efefef;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+[data-theme='light'] {
+  /* VARIABLES MODE CLAR */
+  --background: #efefef;
+  --foreground: #121212;
+  --nav-text: #121212;
+  --border-color: #cccccc;
+  --subtext: #121212;
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Re-assegurem que les fonts estiguin disponibles al tema light */
+  --font-titol: 'Azaret Mono', monospace;
+  --font-cos: 'Chivo Mono', monospace;
 }
 
 * {
@@ -30,13 +30,23 @@ body {
   margin: 0;
 }
 
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-cos) !important;
+  /* Millora la definició de les fonts monoespaiades */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  /* Evita que el navegador decideixi el gruix per tu */
+  font-weight: 500; 
+}
+
 a {
   color: inherit;
   text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }
