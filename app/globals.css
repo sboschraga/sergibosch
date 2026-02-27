@@ -2,26 +2,23 @@
 :root {
   --font-titol: 'Azaret Mono', monospace;
   --font-cos: 'Chivo Mono', monospace;
-
-  /* VARIABLES MODE FOSC (Per defecte) */
   --background: #121212;
   --foreground: #efefef;
   --nav-text: #efefef;
   --border-color: #222222;
   --subtext: #efefef;
+  --dot-color: #333333; /* <-- AFEGEIX AIXÒ */
 }
 
 [data-theme='light'] {
-  /* VARIABLES MODE CLAR */
   --background: #efefef;
   --foreground: #121212;
   --nav-text: #121212;
   --border-color: #cccccc;
   --subtext: #121212;
-
-  /* Re-assegurem que les fonts estiguin disponibles al tema light */
   --font-titol: 'Azaret Mono', monospace;
   --font-cos: 'Chivo Mono', monospace;
+  --dot-color: #cccccc; /* <-- AFEGEIX AIXÒ */
 }
 
 * {

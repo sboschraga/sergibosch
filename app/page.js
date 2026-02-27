@@ -1,43 +1,22 @@
 'use client';
-import { useState, useMemo, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import DecryptedText from '../components/DecryptedText';
 import ImageTrail from '../components/ImageTrail';
-import Loader from '../components/Loader';
 import FlowingMenu from '../components/FlowingMenu';
+import Navbar from '../components/Navbar';
 
 export default function Home() {
-  const [loading, setLoading] = useState(true);
-  const [showNav, setShowNav] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  // Ara només necessitem aquest estat a la Home
   const [isHoveringMenu, setIsHoveringMenu] = useState(false);
-  const [theme, setTheme] = useState('dark');
 
-  useEffect(() => {
-    const controlNavbar = () => {
-      if (window.scrollY > lastScrollY && window.scrollY > 100) {
-        setShowNav(false);
-      } else {
-        setShowNav(true);
-      }
-      setLastScrollY(window.scrollY);
-    };
-    window.addEventListener('scroll', controlNavbar);
-    return () => window.removeEventListener('scroll', controlNavbar);
-  }, [lastScrollY]);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
-  };
-
+  // Enllaços actualitzats amb les rutes reals
   const demoItems = [
     { link: '/doom', text: 'The Doom Race', image: '/trail/Doom_1.jpg' },
-    { link: '#', text: 'Vasudeva', image: '/trail/Vasudeva_3.jpg' },
-    { link: '#', text: 'Culactiu', image: '/trail/Culactiu_11.jpg' },
-    { link: '#', text: 'Phubbing', image: '/trail/Relationships_3.jpg' },
-    { link: '#', text: 'Malreal', image: '/trail/Malreal_4.jpg' },
-    { link: '#', text: 'Cumulus Workshop', image: '/trail/Cumulus_3.jpg' },
+    { link: '/vasudeva', text: 'Vasudeva', image: '/trail/Vasudeva_3.jpg' },
+    { link: '/culactiu', text: 'Culactiu', image: '/trail/Culactiu_11.jpg' },
+    { link: '/phubbing', text: 'Phubbing', image: '/trail/Relationships_3.jpg' },
+    { link: '/malreal', text: 'Malreal', image: '/trail/Malreal_4.jpg' },
+    { link: '/cumulus', text: 'Cumulus Workshop', image: '/trail/Cumulus_3.jpg' },
   ];
 
   const projects = useMemo(() => ({
@@ -61,65 +40,28 @@ export default function Home() {
 
   return (
     <>
-      {loading && <Loader onFinished={() => setLoading(false)} />}
-      
-      <main style={{ 
-        width: '100vw', 
-        backgroundColor: 'var(--background)', 
-        opacity: loading ? 0 : 1, 
-        transition: 'opacity 0.8s ease, background-color 0.3s ease' 
-      }}>
+      <main style={{ width: '100vw', backgroundColor: 'var(--background)', transition: 'background-color 0.3s ease' }}>
         
-        <nav style={{ 
-          position: 'fixed', top: 0, width: '100%', zIndex: 100,
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 30px', 
-          fontFamily: 'var(--font-titol)', fontSize: '1.2rem', fontWeight: '700',
-          textTransform: 'uppercase', letterSpacing: '1px',
-          transform: showNav ? 'translateY(0)' : 'translateY(-100%)',
-          transition: 'transform 0.4s ease-in-out',
-          color: 'var(--nav-text)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <span onClick={() => window.scrollTo({top:0, behavior:'smooth'})} style={{ cursor: 'pointer' }}>
-              Sergi Bosch Raga
-            </span>
-            <button 
-              onClick={toggleTheme}
-              style={{
-                background: 'none',
-                border: '1px solid var(--border-color)',
-                borderRadius: '20px',
-                padding: '4px 12px',
-                fontSize: '0.7rem',
-                cursor: 'pointer',
-                color: 'var(--nav-text)',
-                fontFamily: 'var(--font-cos)',
-                textTransform: 'uppercase',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              {theme === 'dark' ? 'Light' : 'Dark'}
-            </button>
-          </div>
-          <span style={{ cursor: 'pointer' }}>Contact</span>
-        </nav>
+        {/* BARRA DE NAVEGACIÓ GLOBAL */}
+        <Navbar />
 
+        {/* SECCIÓ 1: HERO */}
         <section style={{ height: '100vh', width: '100vw', position: 'relative', overflow: 'hidden' }}>
+          {/* Fons de punts (només a aquesta secció, amb la variable css --dot-color) */}
           <div style={{ 
-            position: 'absolute', 
-            inset: 0, 
-            backgroundImage: `radial-gradient(circle, ${theme === 'dark' ? '#333' : '#ccc'} 1px, transparent 1px)`, 
-            backgroundSize: '30px 30px', 
-            zIndex: 0,
-            transition: 'background-image 0.3s ease'
+            position: 'absolute', inset: 0, 
+            backgroundImage: `radial-gradient(circle, var(--dot-color) 1px, transparent 1px)`, 
+            backgroundSize: '30px 30px', zIndex: 0, transition: 'background-image 0.3s ease'
           }} />
           
+          {/* El Trail només es mostra si NO estem sobre el menú */}
           {!isHoveringMenu && (
             <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
               <ImageTrail items={interleavedList} />
             </div>
           )}
 
+          {/* Text central d'introducció */}
           <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', flexDirection: 'column', pointerEvents: 'none' }}>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '0 20px' }}>
               <h1 style={{ color: 'var(--foreground)', fontFamily: 'var(--font-cos)', fontSize: '1.5rem', maxWidth: '1100px', lineHeight: '1.4', pointerEvents: 'auto' }}>
@@ -132,48 +74,24 @@ export default function Home() {
           </div>
         </section>
 
+        {/* SECCIÓ 2: GALERIA DE PROJECTES */}
         <section 
           onMouseEnter={() => setIsHoveringMenu(true)}
           onMouseLeave={() => setIsHoveringMenu(false)}
-          style={{ 
-            height: '100vh', 
-            width: '100vw', 
-            position: 'relative', 
-            backgroundColor: 'var(--background)', 
-            zIndex: 10,
-            transition: 'background-color 0.3s ease'
-          }}
+          style={{ height: '100vh', width: '100vw', position: 'relative', backgroundColor: 'var(--background)', zIndex: 10, transition: 'background-color 0.3s ease' }}
         >
           <FlowingMenu 
-            items={demoItems} 
-            speed={15}
-            bgColor="var(--background)"
-            textColor="var(--nav-text)"
-            marqueeBgColor="var(--nav-text)"
-            marqueeTextColor="var(--background)"
-            borderColor="var(--border-color)"
+            items={demoItems} speed={15}
+            bgColor="var(--background)" textColor="var(--nav-text)"
+            marqueeBgColor="var(--nav-text)" marqueeTextColor="var(--background)" borderColor="var(--border-color)"
           />
         </section>
 
+        {/* ESTILS GLOBALS DE LA PÀGINA */}
         <style jsx global>{`
-          :root { 
-            --font-titol: 'Azaret Mono', monospace; 
-            --font-cos: 'Chivo Mono', monospace; 
-          }
-          body { 
-            margin: 0; 
-            background-color: var(--background); 
-            color: var(--foreground); 
-            overflow-x: hidden; 
-            scroll-behavior: smooth; 
-          }
-          .subtext { 
-            color: var(--subtext); 
-            font-size: 1.1rem; 
-            font-weight: 400; 
-            font-family: var(--font-cos); 
-            transition: color 0.3s ease; 
-          }
+          :root { --font-titol: 'Azaret Mono', monospace; --font-cos: 'Chivo Mono', monospace; }
+          body { margin: 0; background-color: var(--background); color: var(--foreground); overflow-x: hidden; scroll-behavior: smooth; }
+          .subtext { color: var(--subtext); font-size: 1.1rem; font-weight: 400; font-family: var(--font-cos); transition: color 0.3s ease; }
         `}</style>
       </main>
     </>

@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
-
+import Link from 'next/link';
 import './FlowingMenu.css';
 
 function FlowingMenu({
@@ -137,7 +137,8 @@ function MenuItem({ link, text, image, speed, textColor, marqueeBgColor, marquee
 
   return (
     <div className="menu__item" ref={itemRef} style={{ borderColor }}>
-      <a
+      {/* CANVIEM LA 'a' PER 'Link' */}
+      <Link
         className="menu__item-link"
         href={link}
         onMouseEnter={handleMouseEnter}
@@ -145,7 +146,7 @@ function MenuItem({ link, text, image, speed, textColor, marqueeBgColor, marquee
         style={{ color: textColor }}
       >
         {text}
-      </a>
+      </Link>
       <div className="marquee" ref={marqueeRef} style={{ backgroundColor: marqueeBgColor }}>
         <div className="marquee__inner-wrap">
           <div className="marquee__inner" ref={marqueeInnerRef} aria-hidden="true">

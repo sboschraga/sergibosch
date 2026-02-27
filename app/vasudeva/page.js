@@ -1,7 +1,7 @@
 'use client';
 import Navbar from '../../components/Navbar';
 
-export default function TheDoomRaceProject() {
+export default function VasudevaProject() {
   return (
     <main style={{ 
       minHeight: '100vh', 
@@ -16,7 +16,7 @@ export default function TheDoomRaceProject() {
     }}>
       
       {/* AQUÍ INCLOEM LA BARRA SUPERIOR GLOBAL */}
-      <Navbar title ="The Doom Race" />
+      <Navbar title ="Vasudeva" />
 
       <section style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <h1 style={{ 
@@ -26,7 +26,7 @@ export default function TheDoomRaceProject() {
           textTransform: 'uppercase',
           marginBottom: '20px'
         }}>
-        The Doom Race
+          Vasudeva
         </h1>
         
         <p style={{ fontSize: '1.2rem', color: 'var(--subtext)', maxWidth: '600px' }}>
