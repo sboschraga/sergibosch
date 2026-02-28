@@ -59,30 +59,33 @@ export default function Navbar({ title }) {
         transition: 'transform 0.4s ease-in-out',
         color: 'var(--nav-text)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        
+        {/* GRUP ESQUERRA: Nom i Ruta */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '15px' }}>
+          <Link href="/" className="nav-link" style={{ cursor: 'pointer', color: 'inherit', textDecoration: 'none' }}>
+            Sergi Bosch Raga
+          </Link>
           
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '15px' }}>
-            <Link href="/" className="nav-link" style={{ cursor: 'pointer', color: 'inherit', textDecoration: 'none' }}>
-              Sergi Bosch Raga
-            </Link>
-            
-            {title && (
-              <span 
-                className="nav-title"
-                onClick={scrollToTop} 
-                style={{ 
-                  cursor: 'pointer', 
-                  fontSize: '0.75rem',  
-                  fontWeight: '500',    
-                  fontFamily: 'var(--font-cos)', 
-                  letterSpacing: '1px'
-                }}
-              >
-                {title}
-              </span>
-            )}
-          </div>
+          {title && (
+            <span 
+              className="nav-title"
+              onClick={scrollToTop} 
+              style={{ 
+                cursor: 'pointer', 
+                fontSize: '0.75rem',  
+                fontWeight: '500',    
+                fontFamily: 'var(--font-cos)', 
+                letterSpacing: '1px'
+              }}
+            >
+              {title}
+            </span>
+          )}
+        </div>
 
+        {/* GRUP DRETA: Icona Light/Dark i Contacte */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '100px' }}>
+          
           {/* ICONA ANIMADA SOL/LLUNA */}
           <animated.svg
             xmlns="http://www.w3.org/2000/svg"
@@ -122,8 +125,10 @@ export default function Navbar({ title }) {
             </animated.g>
           </animated.svg>
 
+          {/* CONTACTE */}
+          <span className="nav-link" style={{ cursor: 'pointer' }}>Contact</span>
+          
         </div>
-        <span className="nav-link" style={{ cursor: 'pointer' }}>Contact</span>
       </nav>
 
       {/* BLOC DE CSS PER ALS EFECTES HOVER */}
