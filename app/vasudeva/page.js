@@ -1,34 +1,38 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Navbar from '../../components/Navbar';
 import FlyingPosters from '../../components/FlyingPosters';
 
+const posterItems = [
+  '/vasudeva/poster1.png', 
+  '/vasudeva/poster2.png'
+];
+
+const galleryImages = [
+  '/vasudeva/Vasudeva_1.png',
+  '/vasudeva/Vasudeva_2.png',
+  '/vasudeva/Vasudeva_3.png',
+  '/vasudeva/Vasudeva_4.png',
+  '/vasudeva/Vasudeva_5.png',
+  '/vasudeva/Vasudeva_6.png'
+];
+
 export default function VasudevaProject() {
-  const [hoveredGallery, setHoveredGallery] = useState(null);
-  
-  // Estats per a la galeria d'imatges
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  // Definim les imatges dels Flying Posters
-  const posterItems = [
-    '/vasudeva/poster1.png', 
-    '/vasudeva/poster2.png'
-  ];
+  // AUTO-SLIDE: Canvia de foto cada 4 segons. S'atura si obres el Lightbox.
+  useEffect(() => {
+    if (isLightboxOpen) return; 
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [isLightboxOpen]);
 
-  // Les teves rutes reals de fotos
-  const galleryImages = [
-    '/vasudeva/Vasudeva_1.png',
-    '/vasudeva/Vasudeva_2.png',
-    '/vasudeva/Vasudeva_3.png',
-    '/vasudeva/Vasudeva_4.png',
-    '/vasudeva/Vasudeva_5.png',
-    '/vasudeva/Vasudeva_6.png'
-  ];
-
-  // Funcions per passar fotos de la galeria
   const nextImage = (e) => {
-    e.stopPropagation(); // Evita que en clicar la fletxa s'obri el lightbox
+    e.stopPropagation(); 
     setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
   };
   const prevImage = (e) => {
@@ -47,38 +51,39 @@ export default function VasudevaProject() {
       <section style={{ 
         display: 'flex', 
         minHeight: '100vh', 
-        padding: 'clamp(80px, 10vh, 120px) clamp(20px, 4vw, 40px) 40px clamp(20px, 4vw, 40px)', 
+        padding: 'var(--spacing-section) clamp(20px, 4vw, 40px) 40px clamp(20px, 4vw, 40px)', 
         maxWidth: '1600px', 
         margin: '0 auto',
-        gap: 'clamp(30px, 6vw, 80px)' /* <-- Distància fluida entre text i pòsters */
+        gap: 'var(--gap-large)' 
       }}>
         
         {/* ESQUERRA: Text */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <h1 style={{ 
-            fontFamily: 'var(--font-titol)', 
-            fontSize: 'clamp(2.2rem, 4vw, 4.5rem)', /* <-- Molt més equilibrat per a portàtils */
-            fontWeight: '700',
+            fontFamily: 'var(--font-poiret)', 
+            fontSize: 'var(--text-h1)', 
+            fontWeight: '400',
             textTransform: 'uppercase',
-            marginBottom: 'clamp(15px, 2vw, 30px)', 
-            lineHeight: '1'
+            marginBottom: 'var(--gap-medium)', 
+            lineHeight: '1',
+            letterSpacing: '2px'
           }}>
             Vasudeva
           </h1>
           
           <div style={{ 
-            fontSize: 'clamp(0.85rem, 1.1vw, 1.1rem)', /* <-- Text base més petit en pantalles d'13" o 15" */
+            fontSize: 'var(--text-body)', 
             color: 'var(--subtext)', 
-            maxWidth: '550px', /* Restringim una mica l'amplada màxima perquè quedi més bloc */
+            maxWidth: '550px', 
             lineHeight: '1.6', 
             display: 'flex', 
             flexDirection: 'column', 
-            gap: 'clamp(12px, 1.5vw, 20px)' /* <-- L'espai entre paràgrafs també s'encongeix al portàtil */
+            gap: 'var(--gap-small)' 
           }}>
             <p>Vasudeva is a 2D indie video game. Inspired by Hermann Hesse’s Siddhartha, it centers on the character Vasudeva and the idea of time as a flowing, eternal river. The game invites players on a reflective journey through themes of grief, healing, and self-discovery.</p>
             <p>With a meditative tone and watercolor-inspired visuals, Vasudeva offers an emotionally rich experience focused on presence and inner peace. It emphasizes storytelling and atmosphere to create a meaningful and contemplative journey.</p>
             <p>Falling within the narrative-driven indie adventure genre, the game draws from philosophical fiction and emotionally immersive titles. Built with Unity, it combines simple mechanics with deep themes to offer a unique and thoughtful gaming experience.</p>
-            <p style={{ marginTop: 'clamp(10px, 2vw, 20px)', fontFamily: 'var(--font-titol)', fontSize: 'clamp(0.75rem, 0.9vw, 0.9rem)', color: 'var(--nav-text)' }}>
+            <p style={{ marginTop: 'var(--gap-small)', fontFamily: 'var(--font-titol)', fontSize: 'var(--text-small)', color: 'var(--nav-text)' }}>
               Developed at Elisava, 2025.
             </p>
           </div>
@@ -92,108 +97,136 @@ export default function VasudevaProject() {
       </section>
 
       {/* =========================================
-          SECCIÓ 2: GALERIA DINÀMICA (FOTOS + VÍDEO)
+          SECCIÓ 2: GALERIA I TRÀILER
           ========================================= */}
-      <section style={{ height: '100vh', width: '100vw', display: 'flex', borderTop: '1px solid var(--border-color)' }}>
+      <section style={{ 
+        height: 'clamp(60vh, 75vh, 800px)', 
+        width: '100%', 
+        display: 'flex', 
+        padding: 'clamp(40px, 5vh, 80px) clamp(20px, 5vw, 60px)', 
+        gap: '20px', 
+        backgroundColor: 'var(--background)'
+      }}>
         
-        {/* ESQUERRA: Galeria d'una foto amb fletxes i efecte Acordió */}
+        {/* ESQUERRA: Galeria Slider amb Desplaçament */}
         <div 
-          onMouseEnter={() => setHoveredGallery('left')}
-          onMouseLeave={() => setHoveredGallery(null)}
-          onClick={() => setIsLightboxOpen(true)} // Obre el zoom en clicar
+          onClick={() => setIsLightboxOpen(true)}
           style={{
-            width: hoveredGallery === 'left' ? '80%' : hoveredGallery === 'right' ? '20%' : '60%',
-            height: '100%',
-            transition: 'width 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
-            borderRight: '1px solid var(--border-color)',
-            padding: '20px',
-            position: 'relative',
-            cursor: 'zoom-in', // Canvia el cursor per indicar que es pot fer zoom
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'var(--background)'
+            flex: 1, 
+            position: 'relative', 
+            cursor: 'zoom-in',
+            borderRadius: '10px', 
+            border: '1px solid var(--border-color)', 
+            backgroundColor: 'var(--background)',
+            overflow: 'hidden' /* <-- Amaga les fotos que queden a fora */
           }}
         >
-          {/* Imatge actual de la galeria */}
-          <img 
-            src={galleryImages[currentIndex]} 
-            alt={`Vasudeva ${currentIndex + 1}`} 
-            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '10px', transition: 'opacity 0.3s ease' }}
-          />
+          {/* TRACK DEL SLIDER */}
+          <div style={{
+            display: 'flex',
+            width: '100%',
+            height: '100%',
+            transform: `translateX(-${currentIndex * 100}%)`, /* <-- Mou el carril */
+            transition: 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)' /* <-- Transició molt suau */
+          }}>
+            {galleryImages.map((src, idx) => (
+              <div key={idx} style={{ minWidth: '100%', height: '100%', position: 'relative' }}>
+                <Image 
+                  src={src} 
+                  alt={`Vasudeva Captura ${idx + 1}`} 
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  style={{ objectFit: 'contain', padding: 'clamp(10px, 2vw, 30px)' }}
+                />
+              </div>
+            ))}
+          </div>
 
-          {/* FLETXES DE NAVEGACIÓ (Només es veuen si la galeria no està encongida al 20%) */}
-          {hoveredGallery !== 'right' && (
-            <>
-              <button onClick={prevImage} style={arrowStyle('left')}>←</button>
-              <button onClick={nextImage} style={arrowStyle('right')}>→</button>
-            </>
-          )}
+          {/* Fletxes de navegació */}
+          <button onClick={prevImage} style={arrowStyle('left')}>←</button>
+          <button onClick={nextImage} style={arrowStyle('right')}>→</button>
         </div>
 
-        {/* DRETA: Vídeo (Acordió) */}
-        <div 
-          onMouseEnter={() => setHoveredGallery('right')}
-          onMouseLeave={() => setHoveredGallery(null)}
-          style={{
-            width: hoveredGallery === 'right' ? '80%' : hoveredGallery === 'left' ? '20%' : '40%',
-            height: '100%',
-            transition: 'width 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
-            padding: '20px',
-            position: 'relative',
-            overflow: 'hidden',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'var(--background)'
-          }}
-        >
-          <div style={{ width: '100%', height: '100%', borderRadius: '10px', overflow: 'hidden', position: 'relative' }}>
-             {/* El teu vídeo de Vasudeva */}
-            <video 
-              autoPlay 
-              loop 
-              muted 
-              playsInline 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            >
-              <source src="/vasudeva/trailer.mp4" type="video/mp4" />
-            </video>
-            
-            {/* Títol que apareix quan la columna de vídeo està estreta */}
-            <div style={{
-              position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backgroundColor: 'rgba(0,0,0,0.4)',
-              opacity: hoveredGallery === 'right' ? 0 : 1,
-              transition: 'opacity 0.3s ease',
-              pointerEvents: 'none'
-            }}>
-               <h2 style={{ color: 'white', fontFamily: 'var(--font-titol)', textTransform: 'uppercase' }}>
-                 Gameplay Video
-               </h2>
-            </div>
-          </div>
+        {/* DRETA: Tràiler del Joc */}
+        <div style={{
+          flex: 1, 
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: '10px',
+          border: '1px solid var(--border-color)',
+          backgroundColor: '#000' 
+        }}>
+          <video 
+            controls 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          >
+            <source src="/vasudeva/trailer.mp4" type="video/mp4" />
+          </video>
         </div>
 
       </section>
 
       {/* =========================================
-          LIGHTBOX (ZOOM FOTOS)
+          LIGHTBOX AMB SLIDER I MINIATURES
           ========================================= */}
       {isLightboxOpen && (
-        <div 
-          onClick={() => setIsLightboxOpen(false)}
-          style={{ 
-            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1000, 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out' 
-          }}
-        >
-          <img 
-            src={galleryImages[currentIndex]} 
-            alt="Fullscreen" 
-            style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: '5px' }}
-          />
-          <span style={{ position: 'absolute', top: '30px', right: '40px', color: 'white', fontFamily: 'var(--font-titol)', fontSize: '2rem' }}>✕</span>
+        <div style={{ 
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 1000, 
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' 
+        }}>
+          
+          <span 
+            onClick={() => setIsLightboxOpen(false)} 
+            style={{ position: 'absolute', top: '30px', right: '40px', color: 'white', fontFamily: 'var(--font-titol)', fontSize: '2rem', cursor: 'pointer', zIndex: 1010 }}
+          >✕</span>
+
+          <button onClick={prevImage} style={arrowStyle('left')}>←</button>
+          <button onClick={nextImage} style={arrowStyle('right')}>→</button>
+
+          {/* Imatge Principal (Ara amb carril animat igual que la galeria petita) */}
+          <div style={{ position: 'relative', width: '90vw', height: '70vh', marginTop: '20px', overflow: 'hidden' }}>
+            <div style={{
+              display: 'flex',
+              width: '100%',
+              height: '100%',
+              transform: `translateX(-${currentIndex * 100}%)`,
+              transition: 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)'
+            }}>
+              {galleryImages.map((src, idx) => (
+                <div key={idx} style={{ minWidth: '100%', height: '100%', position: 'relative' }}>
+                  <Image src={src} alt={`Fullscreen ${idx + 1}`} fill sizes="90vw" style={{ objectFit: 'contain', borderRadius: '5px' }} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tira de Miniatures Inferior */}
+          <div style={{ 
+            display: 'flex', gap: '15px', marginTop: '30px', maxWidth: '90vw', 
+            overflowX: 'auto', paddingBottom: '10px',
+            scrollbarWidth: 'none', msOverflowStyle: 'none'
+          }}>
+            {galleryImages.map((src, idx) => (
+              <div 
+                key={idx} 
+                onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
+                style={{ 
+                  position: 'relative', width: '90px', height: '50px', flexShrink: 0, 
+                  cursor: 'pointer', borderRadius: '5px', overflow: 'hidden',
+                  opacity: idx === currentIndex ? 1 : 0.4, 
+                  border: idx === currentIndex ? '2px solid white' : '2px solid transparent',
+                  transition: 'all 0.3s ease' 
+                }}
+              >
+                <Image src={src} alt={`Thumbnail ${idx + 1}`} fill sizes="90px" style={{ objectFit: 'cover' }} />
+              </div>
+            ))}
+          </div>
+
         </div>
       )}
 
@@ -201,7 +234,7 @@ export default function VasudevaProject() {
   );
 }
 
-// Funcions d'estil per les fletxes de la galeria per no embrutar el codi principal
+// Estils de fletxes
 const arrowStyle = (side) => ({
   position: 'absolute',
   top: '50%',

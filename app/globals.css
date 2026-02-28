@@ -1,26 +1,50 @@
-/* DEFINICIÓ DE VARIABLES I FONTS */
+@import url('https://fonts.googleapis.com/css2?family=Poiret+One&display=swap');
+
+/* =========================================
+   DEFINICIÓ DE VARIABLES I FONTS GLOBALS
+   ========================================= */
 :root {
+  /* Fonts */
   --font-titol: 'Azaret Mono', monospace;
   --font-cos: 'Chivo Mono', monospace;
+  --font-poiret: 'Poiret One', sans-serif;
+
+  /* Colors (Mode Fosc per defecte) */
   --background: #121212;
   --foreground: #efefef;
   --nav-text: #efefef;
   --border-color: #222222;
   --subtext: #efefef;
-  --dot-color: #333333; /* <-- AFEGEIX AIXÒ */
+  --dot-color: #333333;
+
+  /* Sistema de Tipografia Fluida (clamp: mínim, ideal, màxim) */
+  --text-h1: clamp(2.2rem, 4vw, 4.5rem);      /* Títols de projecte */
+  --text-h2: clamp(1.5rem, 2.5vw, 2.5rem);    /* Subtítols (ex: Gameplay Video) */
+  --text-body: clamp(0.85rem, 1.1vw, 1.1rem); /* Text dels paràgrafs */
+  --text-small: clamp(0.75rem, 0.9vw, 0.9rem);/* Textos petits i crèdits */
+
+  /* Sistema d'Espaiat Fluid */
+  --spacing-section: clamp(80px, 10vh, 120px); /* Espai superior sota el Navbar */
+  --gap-large: clamp(30px, 6vw, 80px);         /* Separació principal entre columnes (text i pòsters) */
+  --gap-medium: clamp(15px, 2vw, 30px);        /* Marges entre títols i text */
+  --gap-small: clamp(12px, 1.5vw, 20px);       /* Marges entre paràgrafs */
 }
 
+/* =========================================
+   COLORS MODE CLAR
+   ========================================= */
 [data-theme='light'] {
   --background: #efefef;
   --foreground: #121212;
   --nav-text: #121212;
   --border-color: #cccccc;
   --subtext: #121212;
-  --font-titol: 'Azaret Mono', monospace;
-  --font-cos: 'Chivo Mono', monospace;
-  --dot-color: #cccccc; /* <-- AFEGEIX AIXÒ */
+  --dot-color: #cccccc;
 }
 
+/* =========================================
+   RESET I ESTILS GLOBALS BÀSICS
+   ========================================= */
 * {
   box-sizing: border-box;
   padding: 0;
@@ -34,11 +58,15 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-cos) !important;
+  
   /* Millora la definició de les fonts monoespaiades */
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* Transició suau al canviar de Dark a Light mode */
   transition: background-color 0.3s ease, color 0.3s ease;
+  
   /* Evita que el navegador decideixi el gruix per tu */
   font-weight: 500; 
 }
