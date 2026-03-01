@@ -83,8 +83,8 @@ export default function Navbar({ title }) {
           )}
         </div>
 
-        {/* GRUP DRETA: Icona Light/Dark i Contacte */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '100px' }}>
+        {/* GRUP DRETA: Icona Light/Dark, About i Contacte */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(30px, 5vw, 30px)' }}> {/* Gap dinàmic per no trepitjar-se en pantalles estretes */}
           
           {/* ICONA ANIMADA SOL/LLUNA */}
           <animated.svg
@@ -125,8 +125,15 @@ export default function Navbar({ title }) {
             </animated.g>
           </animated.svg>
 
-          {/* CONTACTE */}
-          <span className="nav-link" style={{ cursor: 'pointer' }}>Contact</span>
+          {/* ENLLAÇOS: ABOUT & CONTACTE */}
+          <div style={{ display: 'flex', gap: '30px' }}>
+            <Link href="/about" className="nav-link" style={{ cursor: 'pointer', color: 'inherit', textDecoration: 'none' }}>
+              About
+            </Link>
+            <Link href="/contact" className="nav-link" style={{ cursor: 'pointer', color: 'inherit', textDecoration: 'none' }}>
+              Contact
+            </Link>
+          </div>
           
         </div>
       </nav>

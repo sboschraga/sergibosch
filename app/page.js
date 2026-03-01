@@ -6,10 +6,8 @@ import FlowingMenu from '../components/FlowingMenu';
 import Navbar from '../components/Navbar';
 
 export default function Home() {
-  // Ara només necessitem aquest estat a la Home
   const [isHoveringMenu, setIsHoveringMenu] = useState(false);
 
-  // Enllaços actualitzats amb les rutes reals
   const demoItems = [
     { link: '/doom', text: 'The Doom Race', image: '/trail/Doom_1.jpg' },
     { link: '/vasudeva', text: 'Vasudeva', image: '/trail/Vasudeva_3.jpg' },
@@ -47,7 +45,7 @@ export default function Home() {
 
         {/* SECCIÓ 1: HERO */}
         <section style={{ height: '100vh', width: '100vw', position: 'relative', overflow: 'hidden' }}>
-          {/* Fons de punts (només a aquesta secció, amb la variable css --dot-color) */}
+          {/* Fons de punts */}
           <div style={{ 
             position: 'absolute', inset: 0, 
             backgroundImage: `radial-gradient(circle, var(--dot-color) 1px, transparent 1px)`, 
@@ -61,7 +59,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* Text central d'introducció */}
+          {/* Text central amb les mides exactes d'abans (1.5rem) */}
           <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', flexDirection: 'column', pointerEvents: 'none' }}>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '0 20px' }}>
               <h1 style={{ color: 'var(--foreground)', fontFamily: 'var(--font-cos)', fontSize: '1.5rem', maxWidth: '1100px', lineHeight: '1.4', pointerEvents: 'auto' }}>
@@ -87,7 +85,7 @@ export default function Home() {
           />
         </section>
 
-        {/* ESTILS GLOBALS DE LA PÀGINA */}
+        {/* ESTILS GLOBALS DE LA PÀGINA AMB EL SUBTEXT RESTAURAT */}
         <style jsx global>{`
           :root { --font-titol: 'Azaret Mono', monospace; --font-cos: 'Chivo Mono', monospace; }
           body { margin: 0; background-color: var(--background); color: var(--foreground); overflow-x: hidden; scroll-behavior: smooth; }

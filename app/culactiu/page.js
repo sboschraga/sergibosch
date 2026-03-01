@@ -88,7 +88,7 @@ export default function CulactiuProject() {
             gap: 'var(--gap-small)' 
           }}>
             <p>
-              This project speaks about the invisible thread that connects the human body to the pavement. It questions the binary of public and private property, proposing instead a "shared belonging" rooted in care and sentiment. Through the lens of the cul-de-sac—an interstitial space where the boundaries of the home and the street blur—Cul Actiu examines how we inhabit the city with our bodies. It is an exploration of "intimacy in the public sphere," arguing that we only truly belong to a place when we decide to care for it, regardless of who holds the legal deed.
+              This project speaks about the invisible thread that connects the human body to the pavement. It questions the binary of public and private property, proposing instead a "shared belonging" rooted in care and sentiment. Through the lens of the cul-de-sac, a space where the boundaries of the home and the street blur, Cul Actiu examines how we inhabit the city with our bodies. It is an exploration of "intimacy in the public sphere," arguing that we only truly belong to a place when we decide to care for it, regardless of who holds the legal deed.
             </p>
 
             <p style={{ marginTop: 'var(--gap-small)', marginBottom: '30px', fontFamily: 'var(--font-titol)', fontSize: 'var(--text-small)', color: 'var(--nav-text)' }}>
