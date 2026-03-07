@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Navbar from '../../components/Navbar';
 import Image from 'next/image';
 
+// HE REESTABLERT EL TEU ARRAY EXACTE: L'ordre no es tocarà més.
 const layoutItems = [
   { id: 'txt1', type: 'text', title: 'The Pause', text: 'In a city dominated by social acceleration and a frenetic drive for productivity, where every corner is designed for consumption or transit, where are the spaces for pause?', width: 'clamp(250px, 25vw, 400px)', align: 'flex-end', ml: '0%', y: '40px', x: '2vw' },
   { id: 'img2', type: 'image', src: '/culactiu/culactiu_2.jpg', width: 'clamp(200px, 20vw, 320px)', align: 'center', ml: '4%', y: '-40px', x: '3vw' },
@@ -44,7 +45,8 @@ export default function CulactiuProject() {
 
   const openLightbox = (src) => {
     const index = galleryImages.findIndex(img => img === src);
-    setCurrentIndex(index);
+    // Si la imatge no és a l'array (com la foto pont si n'hi poses una de diferent), obrim la primera per defecte
+    setCurrentIndex(index !== -1 ? index : 0);
     setIsLightboxOpen(true);
   };
 
@@ -54,9 +56,10 @@ export default function CulactiuProject() {
       <Navbar title="Culactiu" />
 
       {/* =========================================
-          SECCIÓ 1: INTRODUCCIÓ 
+          SECCIÓ 1: INTRODUCCIÓ (AMB FOTO TALLADA AL LÍMIT)
           ========================================= */}
       <section style={{ 
+        position: 'relative', // Vital per ancorar la foto "pont" al fons
         display: 'flex', 
         minHeight: '100vh', 
         padding: 'var(--spacing-section) clamp(20px, 4vw, 40px) 40px clamp(20px, 4vw, 40px)', 
@@ -65,8 +68,12 @@ export default function CulactiuProject() {
         gap: 'var(--gap-large)' 
       }}>
         
-        {/* ESQUERRA: Textos alineats al centre verticalment */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {/* ESQUERRA: Textos alineats al centre verticalment (ES DIFUMINA) */}
+        <div style={{ 
+            flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            transition: 'all 0.4s ease', 
+            filter: isSomethingHovered ? 'blur(6px) brightness(0.7)' : 'blur(0px) brightness(1)' // Efecte blur aplicat
+        }}>
           <h1 style={{ 
             fontFamily: 'var(--font-titol)', 
             fontSize: 'var(--text-h1)', 
@@ -95,7 +102,8 @@ export default function CulactiuProject() {
               Developed at Elisava, 2026.
             </p>
 
-            <div>
+            {/* Evitem que el blur s'apliqui en fer hover directament al botó */}
+            <div onMouseEnter={(e) => e.stopPropagation()}>
               <a 
                 href="https://culactiu-web.vercel.app/" 
                 target="_blank" 
@@ -139,16 +147,47 @@ export default function CulactiuProject() {
           </div>
         </div>
 
+        {/* =========================================
+            FOTO TALLADA (PONT CAP A L'SCROLL)
+            He usat culactiu_2.jpg com a exemple.
+            ========================================= */}
+        <div 
+          onClick={() => openLightbox('/culactiu/culactiu_2.jpg')} 
+          onMouseEnter={() => setHoveredIndex('imgBridge')}
+          onMouseLeave={() => setHoveredIndex(null)}
+          style={{
+            position: 'absolute',
+            bottom: '-80px', // Això fa que quedi "tallada" pel límit de la pantalla
+            left: '50%', // Centrada
+            transform: `translateX(-50%) ${isSomethingHovered && hoveredIndex === 'imgBridge' ? 'scale(1.08)' : 'scale(1)'}`,
+            width: 'clamp(150px, 15vw, 250px)',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            boxShadow: isSomethingHovered && hoveredIndex === 'imgBridge' ? '0 20px 40px rgba(0,0,0,0.5)' : '0 4px 10px rgba(0,0,0,0.1)',
+            transition: 'all 0.4s ease',
+            filter: isSomethingHovered && hoveredIndex !== 'imgBridge' ? 'blur(8px) brightness(0.6)' : 'blur(0px) brightness(1)',
+            cursor: cursorPersonalitzat,
+            zIndex: 20
+          }}
+        >
+          <Image 
+            src="/culactiu/culactiu_2.jpg" 
+            alt="Culactiu transition image" 
+            width={400} height={600} 
+            style={{ width: '100%', height: 'auto', display: 'block' }} 
+          />
+        </div>
+
       </section>
 
       {/* =========================================
-          GALERIA ESCAMPADA 
+          GALERIA ESCAMPADA (AMB L'ORDRE ORIGINAL)
           ========================================= */}
       <section 
         onMouseLeave={() => setHoveredIndex(null)}
         style={{ 
           width: '100vw', 
-          padding: 'clamp(80px, 15vh, 200px) clamp(20px, 5vw, 80px)', 
+          padding: 'clamp(100px, 15vh, 150px) clamp(20px, 5vw, 80px)', // Padding afegit perquè no es solapi amb la foto pont
           display: 'flex',
           flexWrap: 'wrap', 
           justifyContent: 'center', 
@@ -193,11 +232,11 @@ export default function CulactiuProject() {
       </section>
 
       {/* =========================================
-          LIGHTBOX AMB SLIDER I MINIATURES
+          LIGHTBOX AMB L'ESTIL DE VASUDEVA APLICAT
           ========================================= */}
       {isLightboxOpen && (
         <div 
-          onClick={() => setIsLightboxOpen(false)} 
+          onClick={() => setIsLightboxOpen(false)} // Clic a fora per tancar
           style={{ 
             position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 1000, 
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', 
@@ -209,34 +248,41 @@ export default function CulactiuProject() {
             style={{ position: 'absolute', top: '30px', right: '40px', color: 'white', fontFamily: 'var(--font-titol)', fontSize: '2rem', cursor: cursorPersonalitzat, zIndex: 1010 }}
           >✕</span>
 
-          {/* Fletxes de navegació */}
-          <button onClick={nextImage} style={arrowStyle('right')}>→</button>
-          <button onClick={prevImage} style={arrowStyle('left')}>←</button>
+          {/* Fletxes de navegació estètica Vasudeva */}
+          <button onClick={prevImage} className="lightbox-arrow left">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button onClick={nextImage} className="lightbox-arrow right">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
 
-          {/* S'HA ELIMINAT EL onClick={(e) => e.stopPropagation()} D'AQUÍ. Ara clicar la foto o els seus costats tancarà el Lightbox */}
+          {/* Contenidor Principal de la Imatge Centrat i Bloquejat pel tancament accidental */}
           <div 
-            style={{ 
-              position: 'relative', width: '90vw', height: '65vh', marginTop: '10px', overflow: 'hidden', 
-              cursor: cursorPersonalitzat 
-            }}
+            style={{ position: 'relative', width: '100%', maxWidth: '1200px', height: '65vh', marginTop: '20px', overflow: 'hidden', display: 'flex', justifyContent: 'center', cursor: 'zoom-out' }}
           >
             <div style={{
-              display: 'flex', width: '100%', height: '100%', transform: `translateX(-${currentIndex * 100}%)`, transition: 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)'
+              display: 'flex', height: '100%', transform: `translateX(-${currentIndex * 100}%)`, transition: 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)', width: '100%'
             }}>
               {galleryImages.map((src, idx) => (
-                <div key={idx} style={{ minWidth: '100%', height: '100%', position: 'relative' }}>
-                  <Image src={src} alt={`Fullscreen ${idx + 1}`} fill sizes="90vw" style={{ objectFit: 'contain', borderRadius: '5px' }} />
+                <div key={idx} style={{ minWidth: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <div 
+                    onClick={(e) => e.stopPropagation()} 
+                    style={{ position: 'relative', width: '100%', height: '100%', cursor: cursorPersonalitzat }}
+                  >
+                    <Image src={src} alt={`Fullscreen ${idx + 1}`} fill sizes="90vw" style={{ objectFit: 'contain', borderRadius: '0' }} />
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
+          {/* Carrusel de Miniatures arrodonides */}
           <div 
             onClick={(e) => e.stopPropagation()}
             style={{ 
               display: 'flex', gap: '15px', marginTop: '20px', maxWidth: '90vw', 
               overflowX: 'auto', paddingBottom: '10px',
-              scrollbarWidth: 'none', msOverflowStyle: 'none'
+              scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: cursorPersonalitzat
             }}
           >
             {galleryImages.map((src, idx) => (
@@ -246,7 +292,7 @@ export default function CulactiuProject() {
                 style={{ 
                   position: 'relative', width: '90px', height: '50px', flexShrink: 0, 
                   cursor: cursorPersonalitzat, 
-                  borderRadius: '5px', overflow: 'hidden',
+                  borderRadius: '8px', overflow: 'hidden',
                   opacity: idx === currentIndex ? 1 : 0.4, 
                   border: idx === currentIndex ? '2px solid white' : '2px solid transparent',
                   transition: 'all 0.3s ease' 
@@ -257,6 +303,7 @@ export default function CulactiuProject() {
             ))}
           </div>
 
+          {/* Link a la web de Culactiu */}
           <a 
             href="https://culactiu-web.vercel.app/" 
             target="_blank" 
@@ -274,14 +321,20 @@ export default function CulactiuProject() {
 
         </div>
       )}
+
+      {/* ESTILS GLOBALS (Fletxes de Vasudeva) */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .lightbox-arrow {
+          position: absolute; top: 50%; transform: translateY(-50%); width: 56px; height: 56px;
+          border-radius: 50%; background-color: rgba(255, 255, 255, 0.1); color: #ffffff;
+          border: 1px solid rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center;
+          cursor: ${cursorPersonalitzat}; transition: all 0.3s ease; z-index: 1015; backdrop-filter: blur(4px);
+        }
+        .lightbox-arrow:hover { background-color: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.6); transform: translateY(-50%) scale(1.05); }
+        .lightbox-arrow.left { left: 40px; }
+        .lightbox-arrow.right { right: 40px; }
+      `}} />
       
     </main>
   );
 }
-
-// Estils de fletxes per al Lightbox
-const arrowStyle = (side) => ({
-  position: 'absolute', top: '50%', [side]: '40px', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.5)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '50%', width: '50px', height: '50px', fontSize: '1.5rem', 
-  cursor: cursorPersonalitzat, 
-  zIndex: 1015, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease',
-});
