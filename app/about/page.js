@@ -143,7 +143,7 @@ export default function AboutPage() {
             <div style={{ width: '100%', height: '24px', marginBottom: 'clamp(15px, 2vh, 20px)', flexShrink: 0 }} />
             
             <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', justifyContent: 'flex-start' }}>
-              <h2 style={mainTitleStyle}>Sergi Bosch Raga</h2>
+              <h2 style={mainTitleStyle}>About Me</h2>
               <p style={{...textStyle, textAlign: 'left', lineHeight: '1.8', marginBottom: '0'}}>
                 I'm Sergi Bosch Raga, an interactive experience designer currently studying at Elisava. My work spans across visual communication, 3D design, and programming, driven by a deep curiosity to explore new tools and methods. I'm always eager to push boundaries and experiment within my projects. Recently, I've developed my skills in fields such as video mapping, sound reactive interfaces and 3D environments.
               </p>
