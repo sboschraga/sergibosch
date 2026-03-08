@@ -3,19 +3,12 @@ import { useState } from 'react';
 import Navbar from '../../components/Navbar';
 import Image from 'next/image';
 
-// TORNEM AL TEU ARRAY EXACTE: Els textos tornaran a la seva posició perfecta.
 const layoutItems = [
   { id: 'txt1', type: 'text', title: 'The Pause', text: 'In a city dominated by social acceleration and a frenetic drive for productivity, where every corner is designed for consumption or transit, where are the spaces for pause?', width: 'clamp(250px, 25vw, 400px)', align: 'flex-end', ml: '0%', y: '40px', x: '2vw' },
-  
-  // MANTENIM L'IMG2 PERQUÈ NO ES TRENCQUI EL DISSENY, però li posem la foto 1 perquè no es vegi repetida al costat del pont.
   { id: 'img2', type: 'image', src: '/culactiu/culactiu_1.jpg', width: 'clamp(200px, 20vw, 320px)', align: 'center', ml: '4%', y: '-40px', x: '3vw' },
-  
   { id: 'img3', type: 'image', src: '/culactiu/culactiu_3.jpg', width: 'clamp(140px, 14vw, 220px)', align: 'flex-start', ml: '2%', y: '80px', x: '-3vw' },
   { id: 'img4', type: 'image', src: '/culactiu/culactiu_4.jpg', width: 'clamp(250px, 22vw, 380px)', align: 'flex-end', ml: '8%', y: '-10px', x: '4vw' },
-  
-  // He posat el .jpg a la foto 11 perquè no falli!
   { id: 'img5', type: 'image', src: '/culactiu/culactiu_11.jpg', width: 'clamp(150px, 16vw, 240px)', align: 'center', ml: '0%', y: '-60px', x: '-2vw' },
-  
   { id: 'txt2', type: 'text', title: 'Formal Analysis', text: 'How do you interpret a space with no exit? We’ve created a formal analysis protocol that turns the morphology of the cul-de-sac into a visual language. Through five key typologies, form, length, ending, access, and flow, every alleyway yields its own graphic signature. These icons aren’t just informative; they are the milestones of a city that refuses to be homogenized.', width: 'clamp(250px, 25vw, 450px)', align: 'flex-start', ml: '12%', y: '30px', x: '-1vw' },
   { id: 'img6', type: 'image', src: '/culactiu/culactiu_6.jpg', width: 'clamp(180px, 18vw, 280px)', align: 'center', ml: '5%', y: '40px', x: '2vw' },
   { id: 'img7', type: 'image', src: '/culactiu/culactiu_7.jpg', width: 'clamp(220px, 24vw, 350px)', align: 'flex-end', ml: '0%', y: '-50px', x: '-4vw' },
@@ -23,12 +16,9 @@ const layoutItems = [
   { id: 'txt3', type: 'text', title: 'Action Protocols', text: 'Culactiu goes beyond the screen. We present five action protocols designed to activate the cul-de-sac through physical presence. Ranging from Cleaning to the Wall every action serves as a claim to citizen sovereignty.', width: 'clamp(260px, 26vw, 420px)', align: 'center', ml: '2%', y: '-30px', x: '-2vw' },
   { id: 'img9', type: 'image', src: '/culactiu/culactiu_9.jpg', width: 'clamp(190px, 19vw, 300px)', align: 'flex-end', ml: '6%', y: '20px', x: '5vw' },
   { id: 'img10', type: 'image', src: '/culactiu/culactiu_5.jpg', width: 'clamp(150px, 14vw, 230px)', align: 'flex-start', ml: '0%', y: '-70px', x: '-3vw' },
-  
-  // Atenció: També he posat el .jpg a la foto 10 per curar-nos en salut
   { id: 'img11', type: 'image', src: '/culactiu/culactiu_10.jpg', width: 'clamp(240px, 21vw, 340px)', align: 'center', ml: '10%', y: '10px', x: '1vw' },
 ];
 
-// Utilitzem un "Set" de Javascript que és màgic: agafa totes les fotos, elimina automàticament qualsevol duplicat, i ens torna una llista neta de les 11 fotos per al Lightbox!
 const galleryImages = [...new Set([
   '/culactiu/culactiu_1.jpg', 
   '/culactiu/culactiu_2.jpg',
