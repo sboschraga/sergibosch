@@ -1,173 +1,260 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, Html, Environment, ContactShadows } from '@react-three/drei';
+import { useGLTF, Html, ContactShadows, OrbitControls } from '@react-three/drei';
+import * as THREE from 'three'; 
 import Navbar from '../../components/Navbar';
 
-// --- LLISTA DE PARAULES (Traiem les de Processing) ---
+// --- ARRAYS EXACTES DEL TEU PROCESSING ---
 const words = [
-  "Turbo", "Infinite", "For You", "Grip", "Likes", "Retention Rate", "Boost", 
-  "Adrenaline", "Feed", "Algorithm", "Status", "Scroll", "Post", "FOMO", 
-  "Trending", "Reels", "Share", "Swipe", "Speed", "Addiction", "$$$", "€€€"
+  "Turbo", "Infinite", "For You", "Grip", "Likes", "Retention Rate", "Boost",
+  "Adrenaline", "Feed", "Algorithm", "Status", "Scroll", "Post", "FOMO",
+  "Trending", "Connection", "Video", "Ranking", "Explore", "Stimulation",
+  "Reels", "Share", "Swipe", "Speed", "Trophies", "Retention", "Comments Section",
+  "Clickbait", "Seen", "Instant", "Highlight", "Virality", "Racing", "DM's",
+  "Followers", "Metrics", "Repost", "Crazy", "Acceleration", "Nitro", "Addiction",
+  "Content", "Live", "Hashtag", "Profile Pic", "Victory", "Filter", "Loop",
+  "Snap", "Visibility", "Clicks", "Hype", "Notifications", "Profile", "Tag",
+  "Comments", "Fuel", "Expectation", "Stories", "###", "@@@", "$$$", "&&&",
+  "<<<", " >>>", "€€€", " ***", "xxx", " +++", " ---", " √√√", "money", "earnings", "doom", "race"
 ];
 
-const colors = ['#FF0000', '#FFD700', '#000FFF', '#FF7D00', '#96FF00', '#00FFF0', '#FF14D7'];
+const phrases = [
+  "DON'T STOP NOW\nDON'T STOP NOW\nDON'T STOP NOW\nDON'T STOP NOW",
+  "FOMO?\nKeep scrolling\nFOMO?\nKeep scrolling\nFOMO?\nKeep scrolling",
+  "Why leave now?\nWhy leave now?\nWhy leave now?\nWhy leave now?\nWhy leave now?",
+  "Every swipe counts\nEvery swipe counts\nEvery swipe counts\nEvery swipe counts",
+  "More scroll\nmore cash\nMore scroll\nmore cash",
+  "You’ll love what’s next\nYou’ll love what’s next\nYou’ll love what’s next",
+  "One more swipe\nOne more swipe\nOne more swipe\nOne more swipe",
+  "Stay scrolling\nstay winning\nStay scrolling\nstay winning"
+];
 
-// --- COMPONENT DEL MODEL 3D I LA FÍSICA ---
-function DoomRaceModel({ setScore, setCurrentWord, setWordColor }) {
-  // Canvia aquesta ruta si el teu arxiu es diu diferent!
-  const { scene } = useGLTF('/doom/doom_race.glb'); 
+const colors = [
+  '#E62117', '#FFFC00', '#3B5998', '#FF6D00', 
+  '#25D366', '#25F4EE', '#DD2A7B', '#FE2C55'
+];
+
+function DoomRaceModel({ setScore, setOrbitEnabled }) {
+  const llantaGltf = useGLTF('/doom/llanta.glb'); 
+  const suportGltf = useGLTF('/doom/suport.glb'); 
   
   const wheelRef = useRef(null);
   const velocity = useRef(0);
   const isDragging = useRef(false);
   const lastY = useRef(0);
-  const lastWordTime = useRef(0);
+  
+  const feedRef = useRef(null); 
+  const scrollOffset = useRef(0);
+  const [activePhrase, setActivePhrase] = useState("");
+  const lastPhraseTime = useRef(0);
 
-  // Quan carrega el model, busquem la capa/peça que es digui "Llanta"
+  const feedWords = useMemo(() => {
+    return Array.from({ length: 400 }).map((_, i) => ({
+      id: i,
+      text: words[Math.floor(Math.random() * words.length)],
+      color: colors[Math.floor(Math.random() * colors.length)]
+    }));
+  }, []);
+
+  // --- MATERIAL GRIS PLATEJAT BRILLANT PER A TOT ---
+  const silverMaterial = new THREE.MeshStandardMaterial({
+    color: '#D0D0D0', // Gris clar
+    side: THREE.DoubleSide,
+    roughness: 0.2,   // Molt llis perquè brilli
+    metalness: 0.9    // Molt metàl·lic
+  });
+
   useEffect(() => {
-    scene.traverse((child) => {
-      // Busca qualsevol malla que porti la paraula "llanta" o "Llanta" al nom
-      if (child.isMesh && child.name.toLowerCase().includes('llanta')) {
-        wheelRef.current = child;
+    llantaGltf.scene.traverse((child) => {
+      if (child.isMesh) {
+        if (child.geometry) child.geometry.computeVertexNormals();
+        child.castShadow = true;    
+        child.receiveShadow = true; 
+        child.material = silverMaterial;
       }
     });
-  }, [scene]);
+  }, [llantaGltf]);
 
-  // --- LÒGICA DEL GIR (Roda d'hàmster) ---
+  useEffect(() => {
+    suportGltf.scene.traverse((child) => {
+      if (child.isMesh) {
+        if (child.geometry) child.geometry.computeVertexNormals();
+        child.castShadow = true;
+        child.receiveShadow = true;
+        child.material = silverMaterial;
+      }
+    });
+  }, [suportGltf]);
+
+  // --- LÒGICA DE GIR ARREGLADA ---
   const handlePointerDown = (e) => {
     e.stopPropagation();
+    e.target.setPointerCapture(e.pointerId); // Captura el ratolí perquè no es perdi en moure'l ràpid
     isDragging.current = true;
     lastY.current = e.clientY;
     document.body.style.cursor = 'grabbing';
+    setOrbitEnabled(false); // BLOQUEGEM LA CÀMERA PER PODER GIRAR
   };
 
   const handlePointerMove = (e) => {
     if (isDragging.current) {
       const delta = e.clientY - lastY.current;
-      velocity.current += delta * 0.002; // Sensibilitat del gir
+      
+      // Només permetem girar cap avall (cap a la pantalla)
+      if (delta > 0) {
+        velocity.current += delta * 0.005; // Sensibilitat ajustada
+      }
       lastY.current = e.clientY;
     }
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e) => {
+    e.stopPropagation();
+    e.target.releasePointerCapture(e.pointerId);
     isDragging.current = false;
     document.body.style.cursor = 'grab';
+    setOrbitEnabled(true); // DESBLOQUEGEM LA CÀMERA
   };
 
-  // El "cor" del joc: s'executa 60 cops per segon
   useFrame((state) => {
-    // 1. Fem girar la llanta si l'hem trobat
     if (wheelRef.current) {
-      wheelRef.current.rotation.x += velocity.current;
+      // 🚨 ATENCIÓ EIX DE GIR 🚨
+      // Si la roda gira de costat com una porta, canvia aquesta 'x' per 'z' o 'y'
+      wheelRef.current.rotation.x += velocity.current; 
     }
     
-    // 2. Apliquem fricció perquè vagi frenant a poc a poc
-    velocity.current *= 0.98;
+    velocity.current *= 0.98; // Frenada suau
 
-    // 3. Lògica dels diners i les paraules si gira prou ràpid
-    const currentSpeed = Math.abs(velocity.current);
+    if (velocity.current < 0.001) velocity.current = 0;
+
+    const currentSpeed = velocity.current;
+    
     if (currentSpeed > 0.05) {
-      // Sumem diners
       setScore((prev) => prev + (0.01212 * currentSpeed));
       
-      // Canviem de paraula aleatòriament cada X milisegons basat en la velocitat
-      if (state.clock.elapsedTime - lastWordTime.current > (0.5 / currentSpeed)) {
-        const randomWord = words[Math.floor(Math.random() * words.length)];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        setCurrentWord(randomWord);
-        setWordColor(randomColor);
-        lastWordTime.current = state.clock.elapsedTime;
+      scrollOffset.current -= currentSpeed * 200; 
+      if (Math.abs(scrollOffset.current) > 20000) scrollOffset.current = 0;
+
+      if (feedRef.current && !activePhrase) {
+        feedRef.current.style.transform = `translateY(${scrollOffset.current}px)`;
       }
-    } else {
-      // Si s'atura, missatge passiu-agressiu
-      if (currentSpeed < 0.001 && currentSpeed > 0) {
-        setCurrentWord("DON'T STOP NOW");
-        setWordColor('#FFFFFF');
-        velocity.current = 0; // Frenada total
+
+      if (state.clock.elapsedTime - lastPhraseTime.current > 4) {
+        if (currentSpeed > 0.1 && !activePhrase) {
+          const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+          setActivePhrase(randomPhrase);
+          lastPhraseTime.current = state.clock.elapsedTime;
+          
+          setTimeout(() => {
+            setActivePhrase("");
+          }, 2500);
+        }
       }
     }
   });
 
   return (
-    <primitive 
-      object={scene} 
-      position={[0, -1, 0]} // Ajusta l'alçada del model sencer
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerOut={handlePointerUp}
-    />
+    <group position={[0, -1, 0]}>
+      <primitive object={suportGltf.scene} scale={0.2} />
+      
+      {/* LA RODA (Ara captura perfectament el clic) */}
+      <primitive 
+        ref={wheelRef} 
+        object={llantaGltf.scene} 
+        scale={0.2} 
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerOut={handlePointerUp}
+      />
+
+      <Html 
+        transform 
+        position={[-18.3, 2.5, 0]} 
+        rotation={[0, Math.PI / 2, 0]} 
+        scale={0.4} 
+      >
+        <div style={{
+          width: '1080px', 
+          height: '1920px', 
+          backgroundColor: '#282828', 
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          boxShadow: `0 0 50px rgba(0,0,0,0.8)`,
+        }}>
+          {activePhrase ? (
+            <div style={{ padding: '40px', textAlign: 'center' }}>
+              <h1 style={{ 
+                fontFamily: 'var(--font-titol), sans-serif', 
+                fontSize: '8rem', 
+                color: '#FFFFFF',
+                whiteSpace: 'pre-line',
+                lineHeight: '1.2'
+              }}>
+                {activePhrase}
+              </h1>
+            </div>
+          ) : (
+            <div ref={feedRef} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', transition: 'none' }}>
+              <h1 style={{ fontFamily: 'monospace', fontSize: '8rem', color: '#fff', margin: '300px 0' }}>
+                {velocity.current === 0 ? "DON'T STOP NOW" : ""}
+              </h1>
+              
+              {feedWords.map((word) => (
+                <h1 key={word.id} style={{ 
+                  fontFamily: 'var(--font-titol), sans-serif', 
+                  fontSize: word.text.length > 8 ? '7rem' : '10rem', 
+                  color: word.color,
+                  textTransform: 'uppercase',
+                  margin: '40px 0',
+                }}>
+                  {word.text}
+                </h1>
+              ))}
+            </div>
+          )}
+        </div>
+      </Html>
+    </group>
   );
 }
 
-// --- PÀGINA PRINCIPAL ---
 export default function DoomRaceProject() {
   const [score, setScore] = useState(0);
-  const [currentWord, setCurrentWord] = useState("READY");
-  const [wordColor, setWordColor] = useState('#FFFFFF');
+  const [orbitEnabled, setOrbitEnabled] = useState(true); // Controlem la càmera des d'aquí
 
   return (
     <main style={{ backgroundColor: '#1a1a1a', color: 'white', height: '100vh', width: '100vw', overflow: 'hidden' }}>
       <Navbar title="The Doom Race" />
 
-      {/* MARCADOR FIXAT A LA PANTALLA (com a la teva instal·lació) */}
       <div style={{ position: 'absolute', top: '100px', left: '40px', zIndex: 10, fontFamily: 'monospace', fontSize: '1.5rem', pointerEvents: 'none' }}>
         <p style={{ color: '#FF7D00' }}>€ 12,12 per 1000 words:</p>
         <p style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>€ {score.toFixed(2)}</p>
       </div>
 
-      {/* L'ESCENARI 3D */}
-      <Canvas camera={{ position: [0, 1.5, 4], fov: 50 }} style={{ cursor: 'grab' }}>
+      <Canvas shadows camera={{ position: [-5, 3, 8], fov: 45, near: 0.1, far: 500 }} style={{ cursor: 'grab' }}>
         
-        {/* Llums boniques perquè llueixi el Rhino */}
-        <ambientLight intensity={0.5} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
+        {/* L'ORBIT CONTROLS ES BLOQUEJA NOMÉS QUAN GIRES LA RODA */}
+        <OrbitControls makeDefault enabled={orbitEnabled} />
 
-        <DoomRaceModel 
-          setScore={setScore} 
-          setCurrentWord={setCurrentWord} 
-          setWordColor={setWordColor} 
-        />
+        <ambientLight intensity={1.5} /> 
+        <directionalLight 
+          position={[5, 10, 5]} 
+          intensity={2.5} 
+          color="#ffffff" 
+          castShadow 
+          shadow-bias={-0.001} 
+        /> 
+        <pointLight position={[-2, 4, 2]} intensity={1.5} color="#ffffff" /> 
 
-        {/* --- LA PANTALLA VIRTUAL --- 
-            Això és un div HTML flotant dins del 3D. 
-            Hauràs de jugar amb el "position" [X, Y, Z] perquè quadri amb el forat de la pantalla de fusta del teu Rhino! */}
-        <Html 
-          transform 
-          position={[0, 1.8, -0.5]} // <-- Muta aquests números per moure la pantalla (Dreta/Esq, Dalt/Baix, Endavant/Endarrere)
-          rotation={[0, 0, 0]}
-          scale={0.5} // <-- Mida de la pantalla
-        >
-          <div style={{
-            width: '800px',
-            height: '450px',
-            backgroundColor: '#000',
-            border: '8px solid #333',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: `0 0 40px ${wordColor}40`, // Resplendor
-            overflow: 'hidden'
-          }}>
-            <h1 style={{ 
-              fontFamily: 'var(--font-titol), sans-serif', 
-              fontSize: currentWord.length > 10 ? '5rem' : '8rem', 
-              color: wordColor,
-              textTransform: 'uppercase',
-              textAlign: 'center',
-              textShadow: `0 0 20px ${wordColor}`
-            }}>
-              {currentWord}
-            </h1>
-          </div>
-        </Html>
+        <DoomRaceModel setScore={setScore} setOrbitEnabled={setOrbitEnabled} />
 
-        {/* Ombra sota l'estructura perquè quedi realista */}
-        <ContactShadows position={[0, -1, 0]} opacity={0.5} scale={10} blur={2} far={4} />
+        <ContactShadows position={[0, -1, 0]} opacity={0.6} scale={15} blur={1.5} far={4} color="#000000" />
       </Canvas>
-      
     </main>
   );
 }
